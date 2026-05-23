@@ -1,3 +1,4 @@
+# Verze 1.0.1 - Produkční nasazení s automatickou CI/CD pipeline přes GitHub Actions
 import os
 import random
 import string
