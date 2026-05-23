@@ -433,6 +433,12 @@ const App = {
         // Export do CSV
         document.getElementById('btn-export-csv').addEventListener('click', () => this.exportToCSV());
 
+        // Vynulování databáze (příprava na reálný provoz)
+        const btnClearDb = document.getElementById('btn-clear-db');
+        if (btnClearDb) {
+            btnClearDb.addEventListener('click', () => this.clearDatabase());
+        }
+
         // Reset databáze
         document.getElementById('btn-reset-db').addEventListener('click', () => this.resetDatabase());
 
@@ -876,6 +882,31 @@ const App = {
             }
         } catch (err) {
             console.error("Nepodařilo se resetovat databázi:", err);
+            SoundEffects.playError();
+        }
+    },
+
+    // VYMAZÁNÍ VŠECH REGISTRACÍ (PŘÍPRAVA NA REÁLNÝ PROVOZ)
+    async clearDatabase() {
+        if (!confirm("VAROVÁNÍ: Tato akce kompletně a nevratně vymaže VŠECHNY registrované návštěvníky z databáze a připraví systém na ostrý provoz. Přejete si pokračovat?")) {
+            return;
+        }
+
+        try {
+            const res = await fetch(`${this.apiBase}/clear`, {
+                method: 'POST'
+            });
+            const data = await res.json();
+
+            if (data.status === 'success') {
+                SoundEffects.playSuccess();
+                alert(data.message);
+                this.loadAdminDashboard();
+            } else {
+                alert(data.message);
+            }
+        } catch (err) {
+            console.error("Nepodařilo se vynulovat registrace:", err);
             SoundEffects.playError();
         }
     }

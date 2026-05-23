@@ -531,6 +531,23 @@ def reset_database():
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
 
+# 7. Vynulování/vymazání všech registrací (příprava na reálný provoz)
+@app.route('/api/clear', methods=['POST'])
+def clear_database():
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute('DELETE FROM visitors')
+        conn.commit()
+        conn.close()
+        return jsonify({
+            "status": "success",
+            "message": "Všechny registrace byly úspěšně vymazány. Databáze je nyní prázdná a připravená na reálný provoz!"
+        })
+        
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
 if __name__ == '__main__':
     # Inicializace databáze (pokud neexistuje) bez vynuceného přepsání dat
     if not os.path.exists(DATABASE):
