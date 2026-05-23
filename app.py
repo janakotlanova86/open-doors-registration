@@ -13,7 +13,7 @@ app = Flask(__name__,
             template_folder='templates')
 
 DATABASE = os.path.join(os.path.dirname(__file__), 'database.db')
-MAX_CAPACITY_PER_SLOT = 25  # Limit kapacity pro jednotlivé sloty (registrovaní hlavní návštěvníci)
+MAX_CAPACITY_PER_SLOT = 15  # Limit kapacity pro jednotlivé sloty (registrovaní hlavní návštěvníci)
 
 def get_db_connection():
     conn = sqlite3.connect(DATABASE)

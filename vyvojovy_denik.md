@@ -66,7 +66,7 @@ Všechny tyto vědecky podložené parametry byly plně integrovány do datové 
 ### 3.1 Funkční požadavky (Functional Requirements)
 *   **FR-1: Registrace a rezervace**: Návštěvník musí mít možnost vyplnit své identifikační údaje, zvolit si skupinu (Student, Rodič, Někdo jiný), vybrat si konkrétní časový slot prohlídky a zvolit obory zájmu.
 *   **FR-2: Fixní termín akce**: Systém je zkonstruován pro jeden pevný, předem definovaný hlavní termín Dne otevřených dveří (**13. října 2026**). Uživatel si termín nevolí (je zobrazen jako statický štítek), což eliminuje chyby při zadávání.
-*   **FR-3: Kapacitní zámek slotů**: Každý 15minutový časový slot má definovanou maximální kapacitu (např. 25 osob). Při naplnění kapacity musí systém slot na frontendu zablokovat a na backendu odmítnout uložení.
+*   **FR-3: Kapacitní zámek slotů**: Každý 15minutový časový slot má definovanou maximální kapacitu (např. 15 osob). Při naplnění kapacity musí systém slot na frontendu zablokovat a na backendu odmítnout uložení.
 *   **FR-4: Generování digitální vstupenky**: Po úspěšném odeslání registrace se uživateli vygeneruje unikátní digitální lístek s kódem (formát `DOD-XXXX`) a simulovaným QR kódem (vektorové SVG).
 *   **FR-5: Administrační panel (Dashboard)**: Přístup k celkovým statistikám (celkem lidí, celkový fyzický počet osob včetně doprovodů, podíl SVP, zájem o ubytování).
 *   **FR-6: Interaktivní datová tabulka**: Zobrazení všech registrovaných s možností rychlého full-textového vyhledávání a pokročilého filtrování podle všech zavedených kritérií (např. pouze žáci se SVP, pouze zájemci o maturitní obory atd.).
@@ -219,7 +219,7 @@ def register_visitor():
             
     time_slot = data['time_slot']
     
-    # Serverové ověření kapacity zvoleného slotu (max 25 osob)
+    # Serverové ověření kapacity zvoleného slotu (max 15 osob)
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute('SELECT COUNT(*) FROM visitors WHERE time_slot = ?', (time_slot,))
@@ -530,9 +530,9 @@ Uchazeč se setká s čistým rozhraním, kde:
 
 ```text
 [ VOLNÉ KAPACITY - 13. října 2026 ]
-  09:00  [████████░░░░░]  15 / 25 volno  (Volno)
-  09:15  [████████████░]  24 / 25 obsazeno  (Téměř plno)
-  09:30  [█████████████]   0 / 25 volno  (Obsazeno)
+  09:00  [████████░░░░░]  10 / 15 volno  (Volno)
+  09:15  [████████████░]  14 / 15 obsazeno  (Téměř plno)
+  09:30  [█████████████]   0 / 15 volno  (Obsazeno)
 ```
 
 ### 6.2 Odbavování u vstupu (Check-in Simulator)
@@ -577,9 +577,9 @@ Systém byl podroben komplexnímu testování pokrývajícímu funkční i zát�
 
 ### 7.2 Zátěžové testy (Capacity Limit Testing)
 Pro ověření spolehlivosti kapacitního zámku byl vytvořen testovací skript, který simuloval souběžné zápisy na jeden časový slot:
-1.  Kapacita slotu `09:15` byla naplněna na 24 z 25 míst.
+1.  Kapacita slotu `09:15` byla naplněna na 14 z 15 míst.
 2.  Dva klienti se pokusili odeslat registraci na stejný čas ve stejnou sekundu.
-3.  Výsledek: První požadavek byl úspěšně zapsán (obsazenost 25/25). Druhý požadavek byl serverem odmítnut s kódem HTTP 400 a chybovou hláškou o plném stavu. Databáze zůstala v konzistentním stavu a limit nebyl překročen.
+3.  Výsledek: První požadavek byl úspěšně zapsán (obsazenost 15/15). Druhý požadavek byl serverem odmítnut s kódem HTTP 400 a chybovou hláškou o plném stavu. Databáze zůstala v konzistentním stavu a limit nebyl překročen.
 
 ---
 
