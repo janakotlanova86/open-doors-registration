@@ -739,6 +739,47 @@ Zavedením reálného QR kódu byl kompletně uzavřen a zprovozněn logistický
 
 Tato inovace povyšuje informační systém ze stavu vizuálního prototypu do stavu **plně nasaditelného podnikového řešení** a představuje vynikající technologický prvek pro praktickou obhajobu závěrečné práce.
 
+### 8.8 Ladění databázových transakcí a stabilizace systému (SQL Parameter Debugging)
+
+V průběhu integračních testů a nasazování nového schématu s podporou doplňkového zájmu o muzeum (`museum_agro`) byl identifikován a úspěšně vyřešen kritický chybový stav databázové vrstvy. Tato zkušenost byla podrobně zdokumentována, neboť demonstruje standardní inženýrské postupy při ladění a stabilizaci relačních databázových systémů (RDBMS).
+
+#### 1. Analýza chybového stavu
+Při pokusu o zápis nového návštěvníka přes endpoint `/api/register` vyvolalo databázové jádro SQLite výjimku:
+```bash
+sqlite3.OperationalError: 20 values for 19 columns
+```
+
+Tato chyba signalizovala strukturální nesoulad mezi definovaným počtem cílových sloupců a počtem hodnot, které se dotaz pokoušel vložit v rámci jednoho řádku. 
+
+#### 2. Technické objasnění a příčina nesouladu
+Detailní inspekcí SQL dotazu `INSERT INTO visitors` bylo zjištěno, že seznam cílových sloupců obsahoval přesně **19 definovaných položek**.
+
+V odpovídající klauzuli `VALUES` však byl zapsán následující řetězec:
+```sql
+VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+```
+
+Analýzou tohoto řetězce bylo odhaleno:
+- Sloupec `checked_in` (stav odbavení u vstupu) byl v dotazu zapsán přímo jako číselný literál `0`. Tento literál nepotřebuje vazbu na Python proměnnou (nevyužívá zástupný znak `?`).
+- Před literálem `0` bylo zapsáno **7 zástupných znaků `?`** (pro id, jméno, e-mail, telefon, skupinu, časový slot a obory zájmu).
+- Za literálem `0` bylo chybně vygenerováno **12 zástupných znaků `?`** (zatímco zbývajících sloupců k zapsání bylo pouze 11).
+
+Tím vznikla situace, kdy klauzule `VALUES` obsahovala celkem **20 prvků** (19 otazníků + 1 statická nula) pro vložení do pouhých **19 sloupců**. Zároveň vazebná n-tice (tuple) předávaná v Pythonu metodou `cursor.execute` obsahovala přesně **18 dynamických hodnot**, což způsobovalo selhání vazebného parseru SQLite.
+
+#### 3. Refaktorování a nápravné opatření
+Řešení spočívalo v přesném matematickém sjednocení struktur:
+1. Z klauzule `VALUES` byl odstraněn přebytečný otazník na samotném konci seznamu hodnot.
+2. Nová upravená klauzule `VALUES` má nyní přesně **18 zástupných znaků `?`** a **1 číselný literál `0`** (celkem 19 hodnot):
+   ```sql
+   VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+   ```
+3. Tím bylo dosaženo absolutní shody s 19 sloupci tabulky a 18 parametry předávanými v Python n-tici (tuple).
+
+#### 4. Integrační testy a ověření stability
+Po provedení opravy v souboru `app.py` byl spuštěn integrační test simulující registraci nového návštěvníka přes klientské rozhraní. Databázová transakce proběhla bezchybně a zápis se úspěšně propsal do SQLite databáze. 
+
+Zařazení této kapitoly do závěrečné práce má vysokou didaktickou hodnotu, neboť ukazuje schopnost autorky diagnostikovat transakční výjimky, analyzovat SQL dotazy na úrovni vazby parametrů a metodicky stabilizovat softwarové řešení.
+
 ---
 
 ## 9. Cloudový hosting a okamžité spuštění pro veřejnost (PythonAnywhere)
