@@ -51,6 +51,7 @@ def init_db(force_recreate=False):
         dormitory_girls INTEGER DEFAULT 0,     -- Zájem o prohlídku domova mládeže pro holky (0=ne, 1=ano)
         workplace_drevarska INTEGER DEFAULT 0, -- Zájem o prohlídku pracoviště na ul. Dřevařská (CNC) (0=ne, 1=ano)
         workplace_skalice INTEGER DEFAULT 0,   -- Zájem o prohlídku pracoviště ve Skalici n. Svitavou (0=ne, 1=ano)
+        museum_agro INTEGER DEFAULT 0,         -- Zájem o prohlídku muzea historických strojů (0=ne, 1=ano)
         primary_school TEXT DEFAULT '',        -- Název základní školy
         grade TEXT DEFAULT '',                 -- Ročník žáka (např. 8. ročník, 9. ročník, Jiný)
         dod_date TEXT DEFAULT '13. října 2026' -- Vybraný termín Dne otevřených dveří
@@ -82,30 +83,30 @@ def generate_ticket_id():
 
 # Vložení rozšířených českých demo dat
 def insert_demo_data(conn):
-    # Formát: (id, name, email, phone, visitor_group, time_slot, interests, checked_in, accompanying_count, svp, tour_type, dormitory_boys, dormitory_girls, workplace_drevarska, workplace_skalice, primary_school, grade, dod_date)
+    # Formát: (id, name, email, phone, visitor_group, time_slot, interests, checked_in, accompanying_count, svp, tour_type, dormitory_boys, dormitory_girls, workplace_drevarska, workplace_skalice, museum_agro, primary_school, grade, dod_date)
     demo_visitors = [
-        ("DOD-A7B2", "Jan Novák", "jan.novak@email.cz", "+420 721 854 963", "Student", "09:00", ["Informační technologie", "Lyceum"], 1, 2, 0, "Skupinová", 1, 0, 1, 0, "ZŠ Boskovice, Nám. 9. května", "9. ročník", "13. října 2026"),
-        ("DOD-C9E1", "Marie Svobodová", "marie.svoboda@seznam.cz", "+420 603 452 118", "Rodič", "09:15", ["Bezpečnostně právní činnost"], 1, 1, 0, "Skupinová", 0, 0, 0, 0, "ZŠ Letovice", "8. ročník", "13. října 2026"),
-        ("DOD-F4D9", "Petr Černý", "cerny.petr@gmail.com", "+420 777 124 556", "Student", "10:00", ["Informační technologie", "Autotronik"], 0, 1, 1, "Individuální", 0, 0, 0, 1, "ZŠ Blansko, Erbenova", "9. ročník", "13. října 2026"),
-        ("DOD-H3K8", "Lucie Dvořáková", "lucinka.dvorakova@atlas.cz", "+420 725 963 147", "Student", "10:30", ["Lyceum", "Bezpečnostně právní činnost"], 1, 0, 0, "Skupinová", 0, 1, 0, 0, "ZŠ Boskovice, Sušilova", "9. ročník", "13. října 2026"),
-        ("DOD-L2P5", "Martin Procházka", "m.prochazka@post.cz", "+420 608 741 258", "Někdo jiný", "11:00", ["Mechanik strojů a zařízení"], 0, 0, 0, "Individuální", 0, 0, 1, 0, "", "Jiný", "13. října 2026"),
-        ("DOD-M8W3", "Jana Kučerová", "kucerova.jana@outlook.com", "+420 739 159 487", "Někdo jiný", "09:30", ["Bezpečnostně právní činnost", "Lyceum"], 0, 3, 0, "Skupinová", 0, 1, 0, 1, "ZŠ Lysice", "Jiný", "13. října 2026"),
-        ("DOD-B5X7", "Tomáš Veselý", "tomas.vesely@centrum.cz", "+420 775 486 215", "Student", "11:15", ["Informační technologie"], 1, 2, 0, "Skupinová", 1, 0, 0, 0, "ZŠ Kunštát", "9. ročník", "13. října 2026"),
-        ("DOD-R9T2", "Kateřina Horáková", "kacka.horakova@gmail.com", "+420 723 548 962", "Student", "13:00", ["Informační technologie", "Bezpečnostně právní činnost"], 0, 1, 0, "Skupinová", 0, 0, 0, 0, "ZŠ Svitavy", "8. ročník", "13. října 2026"),
-        ("DOD-P4Q1", "Jiří Němec", "nemec.jiri@volny.cz", "+420 602 147 852", "Rodič", "13:30", ["Mechanik opravář motorových vozidel"], 0, 2, 0, "Individuální", 1, 0, 0, 0, "ZŠ Boskovice, Nám. 9. května", "9. ročník", "13. října 2026"),
-        ("DOD-Y3Z9", "Veronika Králová", "verca.kralova@seznam.cz", "+420 776 985 321", "Student", "14:00", ["Opravář zemědělských strojů"], 1, 1, 0, "Skupinová", 0, 1, 1, 0, "ZŠ Letovice", "9. ročník", "13. října 2026"),
-        ("DOD-K5J2", "Pavel Marek", "pavel.marek@email.cz", "+420 731 546 978", "Někdo jiný", "15:00", ["Elektromechanik pro zařízení a přístroje", "Informační technologie"], 0, 0, 0, "Individuální", 0, 0, 0, 0, "", "Jiný", "13. října 2026"),
-        ("DOD-N8S4", "Anna Benešová", "anna.benesova@post.cz", "+420 722 358 149", "Student", "09:45", ["Obráběč kovů"], 0, 2, 0, "Skupinová", 0, 0, 0, 1, "ZŠ Blansko, Erbenova", "9. ročník", "13. října 2026")
+        ("DOD-A7B2", "Jan Novák", "jan.novak@email.cz", "+420 721 854 963", "Student", "09:00", ["Informační technologie", "Lyceum"], 1, 2, 0, "Skupinová", 1, 0, 1, 0, 0, "ZŠ Boskovice, Nám. 9. května", "9. ročník", "13. října 2026"),
+        ("DOD-C9E1", "Marie Svobodová", "marie.svoboda@seznam.cz", "+420 603 452 118", "Rodič", "09:15", ["Bezpečnostně právní činnost"], 1, 1, 0, "Skupinová", 0, 0, 0, 0, 0, "ZŠ Letovice", "8. ročník", "13. října 2026"),
+        ("DOD-F4D9", "Petr Černý", "cerny.petr@gmail.com", "+420 777 124 556", "Student", "10:00", ["Informační technologie", "Autotronik"], 0, 1, 1, "Individuální", 0, 0, 0, 1, 1, "ZŠ Blansko, Erbenova", "9. ročník", "13. října 2026"),
+        ("DOD-H3K8", "Lucie Dvořáková", "lucinka.dvorakova@atlas.cz", "+420 725 963 147", "Student", "10:30", ["Lyceum", "Bezpečnostně právní činnost"], 1, 0, 0, "Skupinová", 0, 1, 0, 0, 0, "ZŠ Boskovice, Sušilova", "9. ročník", "13. října 2026"),
+        ("DOD-L2P5", "Martin Procházka", "m.prochazka@post.cz", "+420 608 741 258", "Někdo jiný", "11:00", ["Mechanik strojů a zařízení"], 0, 0, 0, "Individuální", 0, 0, 1, 0, 0, "", "Jiný", "13. října 2026"),
+        ("DOD-M8W3", "Jana Kučerová", "kucerova.jana@outlook.com", "+420 739 159 487", "Někdo jiný", "09:30", ["Bezpečnostně právní činnost", "Lyceum"], 0, 3, 0, "Skupinová", 0, 1, 0, 1, 1, "ZŠ Lysice", "Jiný", "13. října 2026"),
+        ("DOD-B5X7", "Tomáš Veselý", "tomas.vesely@centrum.cz", "+420 775 486 215", "Student", "11:15", ["Informační technologie"], 1, 2, 0, "Skupinová", 1, 0, 0, 0, 0, "ZŠ Kunštát", "9. ročník", "13. října 2026"),
+        ("DOD-R9T2", "Kateřina Horáková", "kacka.horakova@gmail.com", "+420 723 548 962", "Student", "13:00", ["Informační technologie", "Bezpečnostně právní činnost"], 0, 1, 0, "Skupinová", 0, 0, 0, 0, 0, "ZŠ Svitavy", "8. ročník", "13. října 2026"),
+        ("DOD-P4Q1", "Jiří Němec", "nemec.jiri@volny.cz", "+420 602 147 852", "Rodič", "13:30", ["Mechanik opravář motorových vozidel"], 0, 2, 0, "Individuální", 1, 0, 0, 0, 1, "ZŠ Boskovice, Nám. 9. května", "9. ročník", "13. října 2026"),
+        ("DOD-Y3Z9", "Veronika Králová", "verca.kralova@seznam.cz", "+420 776 985 321", "Student", "14:00", ["Opravář zemědělských strojů"], 1, 1, 0, "Skupinová", 0, 1, 1, 0, 1, "ZŠ Letovice", "9. ročník", "13. října 2026"),
+        ("DOD-K5J2", "Pavel Marek", "pavel.marek@email.cz", "+420 731 546 978", "Někdo jiný", "15:00", ["Elektromechanik pro zařízení a přístroje", "Informační technologie"], 0, 0, 0, "Individuální", 0, 0, 0, 0, 0, "", "Jiný", "13. října 2026"),
+        ("DOD-N8S4", "Anna Benešová", "anna.benesova@post.cz", "+420 722 358 149", "Student", "09:45", ["Obráběč kovů"], 0, 2, 0, "Skupinová", 0, 0, 0, 1, 0, "ZŠ Blansko, Erbenova", "9. ročník", "13. října 2026")
     ]
     
     cursor = conn.cursor()
     for item in demo_visitors:
         cursor.execute('''
         INSERT INTO visitors (id, name, email, phone, visitor_group, time_slot, interests, checked_in,
-                              accompanying_count, svp, tour_type, dormitory_boys, dormitory_girls, workplace_drevarska, workplace_skalice, primary_school, grade, dod_date)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                              accompanying_count, svp, tour_type, dormitory_boys, dormitory_girls, workplace_drevarska, workplace_skalice, museum_agro, primary_school, grade, dod_date)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ''', (item[0], item[1], item[2], item[3], item[4], item[5], json.dumps(item[6]), item[7],
-              item[8], item[9], item[10], item[11], item[12], item[13], item[14], item[15], item[16], item[17]))
+              item[8], item[9], item[10], item[11], item[12], item[13], item[14], item[15], item[16], item[17], item[18]))
     conn.commit()
 
 # --- WEB ŠABLONY ---
@@ -156,6 +157,9 @@ def get_stats():
         
         cursor.execute('SELECT COUNT(*) FROM visitors WHERE workplace_skalice = 1' + (" AND dod_date = ?" if params else ""), params)
         total_workplace_skalice = cursor.fetchone()[0]
+        
+        cursor.execute('SELECT COUNT(*) FROM visitors WHERE museum_agro = 1' + (" AND dod_date = ?" if params else ""), params)
+        total_museum_agro = cursor.fetchone()[0]
         
         # Počet žáků se speciálními vzdělávacími potřebami (SVP)
         cursor.execute('SELECT COUNT(*) FROM visitors WHERE svp = 1' + (" AND dod_date = ?" if params else ""), params)
@@ -227,6 +231,7 @@ def get_stats():
                 "totalDormitoryGirls": total_dormitory_girls,
                 "totalWorkplaceDrevarska": total_workplace_drevarska,
                 "totalWorkplaceSkalice": total_workplace_skalice,
+                "totalMuseumAgro": total_museum_agro,
                 "totalSvp": total_svp,
                 "tourTypes": {
                     "Skupinová": tour_type_data.get("Skupinová", 0),
@@ -302,10 +307,12 @@ def get_visitors():
             query += ' AND workplace_drevarska = 1'
         elif dormitory == 'skalice':
             query += ' AND workplace_skalice = 1'
+        elif dormitory == 'museum':
+            query += ' AND museum_agro = 1'
         elif dormitory == 'any':
-            query += ' AND (dormitory_boys = 1 OR dormitory_girls = 1 OR workplace_drevarska = 1 OR workplace_skalice = 1)'
+            query += ' AND (dormitory_boys = 1 OR dormitory_girls = 1 OR workplace_drevarska = 1 OR workplace_skalice = 1 OR museum_agro = 1)'
         elif dormitory == 'none':
-            query += ' AND dormitory_boys = 0 AND dormitory_girls = 0 AND workplace_drevarska = 0 AND workplace_skalice = 0'
+            query += ' AND dormitory_boys = 0 AND dormitory_girls = 0 AND workplace_drevarska = 0 AND workplace_skalice = 0 AND museum_agro = 0'
             
         # Filtrování podle typu prohlídky
         if tour_type and tour_type != 'all':
@@ -344,6 +351,7 @@ def get_visitors():
                 "dormitory_girls": bool(row['dormitory_girls']),
                 "workplace_drevarska": bool(row['workplace_drevarska']),
                 "workplace_skalice": bool(row['workplace_skalice']),
+                "museum_agro": bool(row['museum_agro']),
                 "primary_school": row['primary_school'],
                 "grade": row['grade'],
                 "dod_date": row['dod_date']
@@ -379,6 +387,7 @@ def register_visitor():
         dormitory_girls = 1 if data.get('dormitory_girls', False) else 0
         workplace_drevarska = 1 if data.get('workplace_drevarska', False) else 0
         workplace_skalice = 1 if data.get('workplace_skalice', False) else 0
+        museum_agro = 1 if data.get('museum_agro', False) else 0
         primary_school = data.get('primary_school', '').strip()
         grade = data.get('grade', '').strip()
         dod_date = data.get('dod_date', '13. října 2026').strip()
@@ -410,10 +419,10 @@ def register_visitor():
         # Zápis do databáze s novými sloupci
         cursor.execute('''
         INSERT INTO visitors (id, name, email, phone, visitor_group, time_slot, interests, checked_in,
-                               accompanying_count, svp, tour_type, dormitory_boys, dormitory_girls, workplace_drevarska, workplace_skalice, primary_school, grade, dod_date)
-        VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                               accompanying_count, svp, tour_type, dormitory_boys, dormitory_girls, workplace_drevarska, workplace_skalice, museum_agro, primary_school, grade, dod_date)
+        VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ''', (ticket_id, name, email, phone, visitor_group, time_slot, json.dumps(interests),
-              accompanying_count, svp, tour_type, dormitory_boys, dormitory_girls, workplace_drevarska, workplace_skalice, primary_school, grade, dod_date))
+              accompanying_count, svp, tour_type, dormitory_boys, dormitory_girls, workplace_drevarska, workplace_skalice, museum_agro, primary_school, grade, dod_date))
         conn.commit()
         
         cursor.execute('SELECT * FROM visitors WHERE id = ?', (ticket_id,))
@@ -437,6 +446,7 @@ def register_visitor():
             "dormitory_girls": bool(row['dormitory_girls']),
             "workplace_drevarska": bool(row['workplace_drevarska']),
             "workplace_skalice": bool(row['workplace_skalice']),
+            "museum_agro": bool(row['museum_agro']),
             "primary_school": row['primary_school'],
             "grade": row['grade'],
             "dod_date": row['dod_date']

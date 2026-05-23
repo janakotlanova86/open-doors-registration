@@ -679,6 +679,40 @@ Aby byla zaručena excelentní vizuální odezva a uživatel intuitivně rozpozn
 
 Tato drobná, ale technicky a logicky promyšlená inovace výrazně zvyšuje logistickou připravenost školy na DOD a dramaticky zlepšuje uživatelskou přívětivost celého systému. Spojení registrace s okamžitým záznamem do osobního rozvrhu demonstruje vysokou technologickou vyspělost prezentovaného řešení v rámci závěrečné práce.
 
+### 8.6 Integrace doplňkové prohlídky školního muzea historických zemědělských strojů
+
+Na základě dodatečných logistických a prezentačních požadavků vedení školy byla do systému implementována nová možnost specifického zájmu: **prohlídka školního muzea historických zemědělských strojů**. Cílem této integrace bylo umožnit zájemcům o studium (zejména v oborech jako Opravář zemědělských strojů či souvisejících technických oborů) vyjádřit zájem o návštěvu této unikátní expozice, a poskytnout tak vedení školy přesná čísla pro plánování průvodcovských kapacit.
+
+Tento požadavek si vyžádal zásahy napříč celou architekturou aplikace (Full-stack integrace):
+
+#### 1. Databázová vrstva (SQLite)
+V databázovém schématu (soubor `app.py`) byl do tabulky `visitors` přidán nový sloupec `museum_agro` typu `INTEGER` s výchozí hodnotou `0` (reprezentující logickou hodnotu Nepravda). Databázové operace v rámci ukládání nového návštěvníka (`/api/register`), mazání a inicializace demo dat byly upraveny tak, aby s tímto polem plně pracovaly a validovaly jej.
+
+#### 2. Backendové API rozhraní (Flask v `app.py`)
+- **Agregace statistik**: V endpointu `/api/stats` byl přidán SQL dotaz `SELECT COUNT(*) FROM visitors WHERE museum_agro = 1` pro zjištění celkového počtu zájemců o muzeum pro daný den či celkově. Tato hodnota se vrací v JSON odpovědi jako klíč `totalMuseumAgro`.
+- **Filtrování návštěvníků**: Endpoint `/api/visitors` byl rozšířen tak, aby umožňoval filtrování dle hodnoty `museum_agro` (předávané z frontendu pod hodnotou filtru `museum`).
+- **Demo data**: Při inicializaci databáze přes `/api/reset` jsou do tabulky vygenerovány demo záznamy, u kterých je hodnota `museum_agro` náhodně rozdělena pro testovací účely.
+
+#### 3. Frontendové uživatelské rozhraní (`index.html`)
+- **Registrační formulář**: Pod zaškrtávací pole pro pracoviště Skalice byl přidán nový stylový checkbox s identifikátorem `form-museum-agro` a doprovodným textem: `🚜 Mám zájem o prohlídku školního muzea historických zemědělských strojů`. Element respektuje moderní glassmorphic layout formuláře a má nastavenou identickou tranzici a responzivní vzhled.
+- **Statistický panel**: V administraci, v rámci widgetu „Doplňkové zájmy“, byl doplněn nový řádek s počítadlem `stat-museum-agro-count` a ikonou traktoru, což správci systému poskytuje okamžitý přehled o celkovém počtu zájemců v reálném čase.
+- **Filtr administrace**: V dropdownu pro filtrování doplňkových zájmů byla přidána možnost `<option value="museum">🚜 Muzeum hist. strojů</option>`.
+
+#### 4. Klientská aplikační logika (`app.js`)
+- **Odeslání dat**: Metoda `initRegistrationForm` odebírá stav zaškrtnutí pole `#form-museum-agro` a předává jej v JSON payloadu pod klíčem `museum_agro` na server.
+- **Digitální vstupenka**: V případě úspěšné registrace a generování digitálního lístku se v sekci doplňkových prohlídek zobrazí speciální položka `🚜 Muzeum hist. strojů`, pokud byl zájem vyjádřen.
+- **Zobrazení v tabulce administrace**: V tabulce registrovaných návštěvníků se u zájemců o prohlídku muzea dynamicky generuje zářivě červený odznak (badge) s popiskem `🚜 Muzeum` s definovaným CSS inline stylem:
+  ```css
+  background: rgba(227, 30, 36, 0.12);
+  color: var(--primary);
+  border: 1px solid rgba(227, 30, 36, 0.22);
+  font-size: 0.7rem;
+  padding: 1px 5px;
+  ```
+- **Export do CSV**: Aby se data dala dále zpracovávat v MS Excel, byl upraven exportní modul. V hlavičce CSV přibyl sloupec `Muzeum hist. strojů` (umístěný logicky mezi sloupec `Skalice` a `SVP`) a při generování řádků se do něj vkládá hodnota `Ano` nebo `Ne` na základě příznaku z databáze.
+
+Tato integrace završuje funkční možnosti specifických zájmů a poskytuje kompletní, robustně ošetřenou funkcionalitu, která odpovídá standardům moderního podnikového vývoje.
+
 ---
 
 ## 9. Cloudový hosting a okamžité spuštění pro veřejnost (PythonAnywhere)

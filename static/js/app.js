@@ -291,6 +291,7 @@ const App = {
             const dormitoryGirls = document.getElementById('form-dormitory-girls').checked;
             const workplaceDrevarska = document.getElementById('form-workplace-drevarska').checked;
             const workplaceSkalice = document.getElementById('form-workplace-skalice').checked;
+            const museumAgro = document.getElementById('form-museum-agro').checked;
             const svp = document.getElementById('form-svp').checked;
             const dodDate = document.getElementById('form-date') ? document.getElementById('form-date').value : '13. října 2026';
             
@@ -313,6 +314,7 @@ const App = {
                 dormitory_girls: dormitoryGirls,
                 workplace_drevarska: workplaceDrevarska,
                 workplace_skalice: workplaceSkalice,
+                museum_agro: museumAgro,
                 svp: svp,
                 dod_date: dodDate
             };
@@ -385,6 +387,7 @@ const App = {
         if (visitor.dormitory_girls) addons.push("👧 DM pro holky");
         if (visitor.workplace_drevarska) addons.push("⚙️ Dřevařská (CNC)");
         if (visitor.workplace_skalice) addons.push("📍 Skalice n. Svit.");
+        if (visitor.museum_agro) addons.push("🚜 Muzeum hist. strojů");
         
         const addonsStr = addons.length > 0 ? addons.join(', ') : 'Žádné doplňkové prohlídky';
         const addonsEl = document.getElementById('ticket-visitor-addons');
@@ -496,6 +499,7 @@ const App = {
         document.getElementById('stat-dormitory-girls-count').innerText = stats.totalDormitoryGirls;
         document.getElementById('stat-workplace-drevarska-count').innerText = stats.totalWorkplaceDrevarska;
         document.getElementById('stat-workplace-skalice-count').innerText = stats.totalWorkplaceSkalice;
+        document.getElementById('stat-museum-agro-count').innerText = stats.totalMuseumAgro;
         document.getElementById('stat-svp-count').innerText = stats.totalSvp;
         
         // Progress ring
@@ -593,6 +597,7 @@ const App = {
                         ${visitor.dormitory_girls ? '<span class="badge" style="background: rgba(var(--secondary-rgb), 0.12); color: var(--secondary); border: 1px solid rgba(var(--secondary-rgb), 0.2); font-size: 0.7rem; padding: 1px 5px;">👧 DM holky</span>' : ''}
                         ${visitor.workplace_drevarska ? '<span class="badge" style="background: rgba(var(--primary-rgb), 0.12); color: var(--primary); border: 1px solid rgba(var(--primary-rgb), 0.2); font-size: 0.7rem; padding: 1px 5px;">⚙️ Dřevařská</span>' : ''}
                         ${visitor.workplace_skalice ? '<span class="badge" style="background: rgba(var(--primary-rgb), 0.12); color: var(--primary); border: 1px solid rgba(var(--primary-rgb), 0.2); font-size: 0.7rem; padding: 1px 5px;">📍 Skalice</span>' : ''}
+                        ${visitor.museum_agro ? '<span class="badge" style="background: rgba(227, 30, 36, 0.12); color: var(--primary); border: 1px solid rgba(227, 30, 36, 0.22); font-size: 0.7rem; padding: 1px 5px;">🚜 Muzeum</span>' : ''}
                         ${visitor.svp ? '<span class="badge" style="background: rgba(244, 63, 94, 0.15); color: var(--rose); border: 1px solid rgba(244, 63, 94, 0.25); font-size: 0.7rem; padding: 1px 5px;">🧩 SVP</span>' : ''}
                     </div>
                 </td>
@@ -810,7 +815,7 @@ const App = {
         }
 
         // Hlavička CSV s českým oddělovačem (středník je v ČR standardem pro Excel)
-        let csvContent = "Kód lístku;Jméno;E-mail;Telefon;Základní škola;Ročník;Skupina;Termín DOD;Čas prohlídky;Doprovod;Typ prohlídky;DM Kluci;DM Holky;Dřevařská;Skalice;SVP;Obory zájmu;Stav;Datum registrace\n";
+        let csvContent = "Kód lístku;Jméno;E-mail;Telefon;Základní škola;Ročník;Skupina;Termín DOD;Čas prohlídky;Doprovod;Typ prohlídky;DM Kluci;DM Holky;Dřevařská;Skalice;Muzeum hist. strojů;SVP;Obory zájmu;Stav;Datum registrace\n";
 
         visitors.forEach(v => {
             const interestsStr = v.interests.join(', ');
@@ -819,6 +824,7 @@ const App = {
             const dgStr = v.dormitory_girls ? "Ano" : "Ne";
             const wdStr = v.workplace_drevarska ? "Ano" : "Ne";
             const wsStr = v.workplace_skalice ? "Ano" : "Ne";
+            const maStr = v.museum_agro ? "Ano" : "Ne";
             const svpStr = v.svp ? "Ano" : "Ne";
             
             // Očištění jmen a hodnot o případné středníky
@@ -827,7 +833,7 @@ const App = {
             const cleanPhone = v.phone.replace(/;/g, ',');
             const cleanSchool = (v.primary_school || '').replace(/;/g, ',');
             
-            csvContent += `${v.id};${cleanName};${cleanEmail};${cleanPhone};${cleanSchool};${v.grade};${v.visitor_group};${v.dod_date || '13. října 2026'};${v.time_slot};${v.accompanying_count};${v.tour_type};${dbStr};${dgStr};${wdStr};${wsStr};${svpStr};"${interestsStr}";${statusStr};${v.registered_at}\n`;
+            csvContent += `${v.id};${cleanName};${cleanEmail};${cleanPhone};${cleanSchool};${v.grade};${v.visitor_group};${v.dod_date || '13. října 2026'};${v.time_slot};${v.accompanying_count};${v.tour_type};${dbStr};${dgStr};${wdStr};${wsStr};${maStr};${svpStr};"${interestsStr}";${statusStr};${v.registered_at}\n`;
         });
 
         // Kódování UTF-8 s BOM, aby Excel správně přečetl české znaky (diakritiku)
