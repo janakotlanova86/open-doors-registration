@@ -420,7 +420,7 @@ def register_visitor():
         cursor.execute('''
         INSERT INTO visitors (id, name, email, phone, visitor_group, time_slot, interests, checked_in,
                                accompanying_count, svp, tour_type, dormitory_boys, dormitory_girls, workplace_drevarska, workplace_skalice, museum_agro, primary_school, grade, dod_date)
-        VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ''', (ticket_id, name, email, phone, visitor_group, time_slot, json.dumps(interests),
               accompanying_count, svp, tour_type, dormitory_boys, dormitory_girls, workplace_drevarska, workplace_skalice, museum_agro, primary_school, grade, dod_date))
         conn.commit()
