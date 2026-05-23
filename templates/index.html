@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="cs" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Den otevřených dveří - Registrační a Informační Systém</title>
+    <!-- Google Fonts - Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- CSS Styl -->
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <!-- Hlavní kontejner aplikace -->
+    <div class="app-container">
+        
+        <!-- Horní kontaktní lišta -->
+        <div class="top-bar glass">
+            <div class="top-bar-left">
+                <span class="top-bar-item">🏫 Střední škola André Citroëna Boskovice</span>
+                <span class="top-bar-divider">|</span>
+                <a href="https://maps.google.com/?q=n%C3%A1m.+9.+kv%C4%9Btna+2153%2F2a%2C+680+01+Boskovice" target="_blank" class="top-bar-link" title="Otevřít na Google Mapách">
+                    📍 nám. 9. května 2153/2a, 680 01 Boskovice
+                    <span class="map-badge">Mapa</span>
+                </a>
+            </div>
+            <div class="top-bar-right">
+                <a href="mailto:kotlanova@skolaac.cz" class="top-bar-link">✉️ kotlanova@skolaac.cz</a>
+                <span class="top-bar-divider">|</span>
+                <a href="tel:+420725983283" class="top-bar-link">📞 725 983 283</a>
+                <span class="top-bar-divider">|</span>
+                <a href="https://www.skolaac.cz" target="_blank" class="top-bar-link">🌐 www.skolaac.cz</a>
+            </div>
+        </div>
+        
+        <!-- Horejší navigace -->
+        <header class="main-header">
+            <div class="logo" style="display: flex; align-items: center;">
+                <img src="/static/logo.png" class="header-logo" alt="Logo SŠ André Citroëna" style="margin-right: 12px;">
+                <div class="logo-text">
+                    <h1 style="font-size: 1.3rem; font-weight: 800; letter-spacing: 0.5px; margin: 0; background: linear-gradient(135deg, var(--text-primary) 30%, var(--secondary) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; line-height: 1.1;">SŠ André Citroëna</h1>
+                    <small style="font-size: 0.72rem; color: var(--text-secondary); font-weight: 600; letter-spacing: 1px; text-transform: uppercase; line-height: 1;">Boskovice</small>
+                </div>
+            </div>
+            
+            <nav class="main-nav">
+                <button class="nav-btn active" data-target="registration-view" id="nav-reg-btn">
+                    <span class="btn-icon">✍️</span> Registrace
+                </button>
+                <button class="nav-btn" data-target="admin-view" id="nav-admin-btn">
+                    <span class="btn-icon">📊</span> Administrace
+                </button>
+            </nav>
+            
+            <a class="header-dod-badge" href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=Den+otev%C5%99en%C3%BDch+dve%C5%99%C3%AD+-+S%C5%A0+Andr%C3%A9+Citro%C3%ABna+Boskovice&dates=20261013T090000/20261013T160000&ctz=Europe/Prague&details=P%C5%99ije%C4%8Fte+se+pod%C3%ADvat+na+na%C5%A1i+%C5%A1kolu!+Uk%C3%A1%C5%BEeme+V%C3%A1m+studijn%C3%AD+obory%2C+modern%C3%AD+vybaven%C3%AD+i+praktickou+v%C3%BDuku.+Vyzkou%C5%A1%C3%ADte+si+spoustu+zaj%C3%ADmav%C3%BDch+v%C4%9Bc%C3%AD+a+nasajete+atmosf%C3%A9ru+%C5%A1koly.%0A%0ARegistra%C4%8Dn%C3%AD+a+informa%C4%8Dn%C3%AD+port%C3%A1l%3A+http%3A%2F%2F127.0.0.1%3A5000%2F&location=n%C3%A1m.+9.+kv%C4%9Btna+2153%2F2a%2C+680+01+Boskovice" target="_blank" title="Zaznamenat do Google Kalendáře" style="text-decoration: none;">
+                <span class="badge-icon">📅</span>
+                <div class="badge-text">
+                    <span class="badge-label">Den otevřených dveří</span>
+                    <span class="badge-value">13. října 2026</span>
+                    <span class="badge-helper" style="font-size: 0.58rem; color: var(--text-secondary); opacity: 0.85; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 3px; display: flex; align-items: center; gap: 3px;">
+                        👉 Uložit do kalendáře
+                    </span>
+                </div>
+            </a>
+            
+            <div class="header-actions">
+                <!-- Přepínač témat (Dark / Light) -->
+                <button id="theme-toggle" class="theme-toggle-btn" title="Přepnout tmavý/světlý režim" aria-label="Přepnout režim">
+                    <svg class="sun-icon" viewBox="0 0 24 24" width="22" height="22">
+                        <circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="2" fill="none" />
+                        <line x1="12" y1="1" x2="12" y2="3" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                        <line x1="12" y1="21" x2="12" y2="23" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                        <line x1="1" y1="12" x2="3" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                        <line x1="21" y1="12" x2="23" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                    </svg>
+                    <svg class="moon-icon" viewBox="0 0 24 24" width="22" height="22">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </button>
+            </div>
+        </header>
+        
+        <!-- HLAVNÍ OBSAH -->
+        <main class="main-content">
+            
+            <!-- SECTION 1: VEŘEJNÝ REGISTRAČNÍ PORTÁL -->
+            <section id="registration-view" class="view-section active">
+                <!-- Hero sekce s odpočtem -->
+                <div class="hero-card glass">
+                    <div class="hero-content-wrapper">
+                        <div class="hero-text-content">
+                            <a class="hero-badge" href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=Den+otev%C5%99en%C3%BDch+dve%C5%99%C3%AD+-+S%C5%A0+Andr%C3%A9+Citro%C3%ABna+Boskovice&dates=20261013T090000/20261013T160000&ctz=Europe/Prague&details=P%C5%99ije%C4%8Fte+se+pod%C3%ADvat+na+na%C5%A1i+%C5%A1kolu!+Uk%C3%A1%C5%BEeme+V%C3%A1m+studijn%C3%AD+obory%2C+modern%C3%AD+vybaven%C3%AD+i+praktickou+v%C3%BDuku.+Vyzkou%C5%A1%C3%ADte+si+spoustu+zaj%C3%ADmav%C3%BDch+v%C4%9Bc%C3%AD+a+nasajete+atmosf%C3%A9ru+%C5%A1koly.%0A%0ARegistra%C4%8Dn%C3%AD+a+informa%C4%8Dn%C3%AD+port%C3%A1l%3A+http%3A%2F%2F127.0.0.1%3A5000%2F&location=n%C3%A1m.+9.+kv%C4%9Btna+2153%2F2a%2C+680+01+Boskovice" target="_blank" title="Zaznamenat do Google Kalendáře" style="text-decoration: none; cursor: pointer;">Den otevřených dveří<br>13. října 2026</a>
+                            <h2>Den otevřených dveří<br>se blíží!</h2>
+                            <p>Jak vypadá škola, která tě bude bavit? Přijď se podívat.<br>Ukážeme ti naše obory, moderní vybavení i praktickou výuku. Vyzkoušíš si spoustu zajímavých věcí a nasaješ atmosféru školy.</p>
+                            
+                            <!-- Odpočet času -->
+                            <div class="countdown-container" id="countdown" data-date="2026-10-10T09:00:00">
+                                <div class="countdown-item">
+                                    <span class="number" id="cd-days">00</span>
+                                    <span class="label">dní</span>
+                                </div>
+                                <div class="countdown-divider">:</div>
+                                <div class="countdown-item">
+                                    <span class="number" id="cd-hours">00</span>
+                                    <span class="label">hodin</span>
+                                </div>
+                                <div class="countdown-divider">:</div>
+                                <div class="countdown-item">
+                                    <span class="number" id="cd-minutes">00</span>
+                                    <span class="label">minut</span>
+                                </div>
+                                <div class="countdown-divider">:</div>
+                                <div class="countdown-item">
+                                    <span class="number" id="cd-seconds">00</span>
+                                    <span class="label">sekund</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="hero-image-content">
+                            <img src="/static/banner.jpg" alt="Studenti SŠ André Citroëna" class="hero-banner-image">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="two-column-layout">
+                    <!-- Formulář registrace -->
+                    <div class="form-card glass">
+                        <div class="card-header">
+                            <span class="card-icon">📝</span>
+                            <h3>Registrační formulář</h3>
+                        </div>
+                        <p class="card-subtitle">Vyplňte prosím své údaje. Po odeslání obdržíte unikátní digitální vstupenku.</p>
+                        
+                        <form id="registration-form" novalidate>
+                            <!-- Jméno a příjmení -->
+                            <div class="form-group">
+                                <label for="form-name">Jméno a příjmení <span class="required">*</span></label>
+                                <div class="input-wrapper">
+                                    <span class="input-icon">👤</span>
+                                    <input type="text" id="form-name" placeholder="např. Jan Novák" required minlength="3">
+                                </div>
+                                <span class="error-msg" id="error-name">Prosím zadejte celé jméno (alespoň 3 znaky).</span>
+                            </div>
+                            
+                            <!-- E-mail -->
+                            <div class="form-group">
+                                <label for="form-email">E-mailová adresa <span class="required">*</span></label>
+                                <div class="input-wrapper">
+                                    <span class="input-icon">✉️</span>
+                                    <input type="email" id="form-email" placeholder="např. jan.novak@seznam.cz" required>
+                                </div>
+                                <span class="error-msg" id="error-email">Zadejte platnou e-mailovou adresu.</span>
+                            </div>
+                            
+                            <!-- Telefon -->
+                            <div class="form-group">
+                                <label for="form-phone">Telefonní číslo <span class="required">*</span></label>
+                                <div class="input-wrapper">
+                                    <span class="input-icon">📞</span>
+                                    <input type="tel" id="form-phone" placeholder="např. +420 721 854 963" required>
+                                </div>
+                                <span class="error-msg" id="error-phone">Zadejte platné telefonní číslo (např. +420 721 854 963).</span>
+                            </div>
+                            
+                            <!-- Údaje o škole (Podle rešerše) -->
+                            <div class="two-column-fields" style="display: grid; grid-template-columns: 1.4fr 1fr; gap: 15px;">
+                                <div class="form-group">
+                                    <label for="form-school">Současná základní škola</label>
+                                    <div class="input-wrapper">
+                                        <span class="input-icon">🏫</span>
+                                        <input type="text" id="form-school" placeholder="např. ZŠ Boskovice">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="form-grade">Ročník</label>
+                                    <select id="form-grade" class="custom-select">
+                                        <option value="9. ročník" selected>9. ročník</option>
+                                        <option value="8. ročník">8. ročník</option>
+                                        <option value="Jiný">Jiný</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Skupina návštěvníka -->
+                            <div class="form-group">
+                                <label>Kdo jste? <span class="required">*</span></label>
+                                <div class="radio-grid">
+                                    <label class="radio-card">
+                                        <input type="radio" name="form-group" value="Student" checked>
+                                        <span class="radio-content">
+                                            <span class="radio-emoji">🎓</span>
+                                            <span class="radio-title">Student</span>
+                                        </span>
+                                    </label>
+                                    <label class="radio-card">
+                                        <input type="radio" name="form-group" value="Rodič">
+                                        <span class="radio-content">
+                                            <span class="radio-emoji">👨‍👩‍👦</span>
+                                            <span class="radio-title">Rodič</span>
+                                        </span>
+                                    </label>
+                                    <label class="radio-card">
+                                        <input type="radio" name="form-group" value="Někdo jiný">
+                                        <span class="radio-content">
+                                            <span class="radio-emoji">🌍</span>
+                                            <span class="radio-title" style="font-size: 0.88rem; line-height: 1.2;">Někdo jiný<br><small style="font-size: 0.65rem; opacity: 0.7;">(bývalý žák apod.)</small></span>
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <!-- Termín Dne otevřených dveří -->
+                            <div class="form-group">
+                                <label>Termín Dne otevřených dveří</label>
+                                <div class="static-date-field" style="background: rgba(227, 30, 36, 0.08); border: 1px solid rgba(227, 30, 36, 0.25); color: var(--text-primary); padding: 12px 16px; border-radius: 12px; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+                                    📅 13. října 2026
+                                </div>
+                                <input type="hidden" id="form-date" value="13. října 2026">
+                            </div>
+
+                            <!-- Časový slot -->
+                            <div class="form-group">
+                                <label for="form-slot">Čas prohlídky <span class="required">*</span></label>
+                                <select id="form-slot" class="custom-select" required>
+                                    <option value="" disabled selected>Vyberte čas startu prohlídky...</option>
+                                    <option value="09:00">09:00</option>
+                                    <option value="09:15">09:15</option>
+                                    <option value="09:30">09:30</option>
+                                    <option value="09:45">09:45</option>
+                                    <option value="10:00">10:00</option>
+                                    <option value="10:15">10:15</option>
+                                    <option value="10:30">10:30</option>
+                                    <option value="10:45">10:45</option>
+                                    <option value="11:00">11:00</option>
+                                    <option value="11:15">11:15</option>
+                                    <option value="11:30">11:30</option>
+                                    <option value="11:45">11:45</option>
+                                    <option value="12:00">12:00</option>
+                                    <option value="12:15">12:15</option>
+                                    <option value="12:30">12:30</option>
+                                    <option value="12:45">12:45</option>
+                                    <option value="13:00">13:00</option>
+                                    <option value="13:15">13:15</option>
+                                    <option value="13:30">13:30</option>
+                                    <option value="13:45">13:45</option>
+                                    <option value="14:00">14:00</option>
+                                    <option value="14:15">14:15</option>
+                                    <option value="14:30">14:30</option>
+                                    <option value="14:45">14:45</option>
+                                    <option value="15:00">15:00</option>
+                                    <option value="15:15">15:15</option>
+                                    <option value="15:30">15:30</option>
+                                    <option value="15:45">15:45</option>
+                                    <option value="16:00">16:00</option>
+                                </select>
+                                <span class="error-msg" id="error-slot">Prosím zvolte časový slot prohlídky.</span>
+                            </div>
+
+                            <!-- Nové parametry organizace (Podle rešerše) -->
+                            <div class="two-column-fields" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 22px;">
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label for="form-accompanying">Počet osob v doprovodu</label>
+                                    <div class="input-wrapper">
+                                        <span class="input-icon">👥</span>
+                                        <input type="number" id="form-accompanying" min="0" max="5" value="0">
+                                    </div>
+                                </div>
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label>Typ prohlídky</label>
+                                    <select id="form-tour-type" class="custom-select">
+                                        <option value="Skupinová" selected>👥 Skupinová</option>
+                                        <option value="Individuální">👤 Individuální</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Obory zájmu -->
+                            <div class="form-group">
+                                <label>Co vás nejvíce zajímá? (Můžete vybrat více možností)</label>
+                                
+                                <div style="font-size: 0.85rem; font-weight: 700; color: var(--secondary); margin-top: 10px; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; letter-spacing: 0.5px; text-transform: uppercase;">
+                                    🎓 Obory zakončené maturitní zkouškou
+                                </div>
+                                <div class="checkbox-grid" style="margin-bottom: 18px;">
+                                    <label class="checkbox-card">
+                                        <input type="checkbox" name="form-interest" value="Informační technologie">
+                                        <span class="checkbox-content">
+                                            <span class="checkbox-box"></span>
+                                            💻 Informační technologie
+                                        </span>
+                                    </label>
+                                    <label class="checkbox-card">
+                                        <input type="checkbox" name="form-interest" value="Bezpečnostně právní činnost">
+                                        <span class="checkbox-content">
+                                            <span class="checkbox-box"></span>
+                                            👮 Bezpečnostně právní činnost
+                                        </span>
+                                    </label>
+                                    <label class="checkbox-card">
+                                        <input type="checkbox" name="form-interest" value="Mechanik strojů a zařízení">
+                                        <span class="checkbox-content">
+                                            <span class="checkbox-box"></span>
+                                            ⚙️ Mechanik strojů a zařízení
+                                        </span>
+                                    </label>
+                                    <label class="checkbox-card">
+                                        <input type="checkbox" name="form-interest" value="Autotronik">
+                                        <span class="checkbox-content">
+                                            <span class="checkbox-box"></span>
+                                            🚗 Autotronik
+                                        </span>
+                                    </label>
+                                    <label class="checkbox-card">
+                                        <input type="checkbox" name="form-interest" value="Lyceum">
+                                        <span class="checkbox-content">
+                                            <span class="checkbox-box"></span>
+                                            📚 Lyceum
+                                        </span>
+                                    </label>
+                                </div>
+                                
+                                <div style="font-size: 0.85rem; font-weight: 700; color: var(--secondary); margin-bottom: 8px; display: flex; align-items: center; gap: 6px; letter-spacing: 0.5px; text-transform: uppercase;">
+                                    🔧 Obory s výučním listem
+                                </div>
+                                <div class="checkbox-grid">
+                                    <label class="checkbox-card">
+                                        <input type="checkbox" name="form-interest" value="Mechanik opravář motorových vozidel">
+                                        <span class="checkbox-content">
+                                            <span class="checkbox-box"></span>
+                                            🔧 Mechanik opravář motorových vozidel (Automechanik)
+                                        </span>
+                                    </label>
+                                    <label class="checkbox-card">
+                                        <input type="checkbox" name="form-interest" value="Opravář zemědělských strojů">
+                                        <span class="checkbox-content">
+                                            <span class="checkbox-box"></span>
+                                            🚜 Opravář zemědělských strojů
+                                        </span>
+                                    </label>
+                                    <label class="checkbox-card">
+                                        <input type="checkbox" name="form-interest" value="Elektromechanik pro zařízení a přístroje">
+                                        <span class="checkbox-content">
+                                            <span class="checkbox-box"></span>
+                                            ⚡ Elektromechanik pro zařízení a přístroje
+                                        </span>
+                                    </label>
+                                    <label class="checkbox-card">
+                                        <input type="checkbox" name="form-interest" value="Obráběč kovů">
+                                        <span class="checkbox-content">
+                                            <span class="checkbox-box"></span>
+                                            🔩 Obráběč kovů
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Doplňkové zájmy -->
+                            <div class="form-group">
+                                <label>Specifické požadavky a doplňkové zájmy</label>
+                                <div class="checkbox-grid" style="grid-template-columns: 1fr;">
+                                    <label class="checkbox-card">
+                                        <input type="checkbox" id="form-dormitory-boys" name="form-dormitory-boys">
+                                        <span class="checkbox-content">
+                                            <span class="checkbox-box"></span>
+                                            🏢 Mám zájem o prohlídku domova mládeže pro kluky
+                                        </span>
+                                    </label>
+                                    <label class="checkbox-card" style="margin-top: 5px;">
+                                        <input type="checkbox" id="form-dormitory-girls" name="form-dormitory-girls">
+                                        <span class="checkbox-content">
+                                            <span class="checkbox-box"></span>
+                                            🏢 Mám zájem o prohlídku domova mládeže pro holky
+                                        </span>
+                                    </label>
+                                    <label class="checkbox-card" style="margin-top: 5px;">
+                                        <input type="checkbox" id="form-workplace-drevarska" name="form-workplace-drevarska">
+                                        <span class="checkbox-content">
+                                            <span class="checkbox-box"></span>
+                                            ⚙️ Mám zájem o prohlídku pracoviště na ulici Dřevařská (CNC dílny)
+                                        </span>
+                                    </label>
+                                    <label class="checkbox-card" style="margin-top: 5px;">
+                                        <input type="checkbox" id="form-workplace-skalice" name="form-workplace-skalice">
+                                        <span class="checkbox-content">
+                                            <span class="checkbox-box"></span>
+                                            📍 Mám zájem o prohlídku pracoviště ve Skalici nad Svitavou
+                                        </span>
+                                    </label>
+                                    <label class="checkbox-card" style="margin-top: 5px;">
+                                        <input type="checkbox" id="form-svp" name="form-svp">
+                                        <span class="checkbox-content">
+                                            <span class="checkbox-box"></span>
+                                            🧩 Jsem žák se speciálními vzdělávacími potřebami (SVP)
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <!-- Tlačítko Odeslat -->
+                            <button type="submit" class="submit-btn" id="submit-btn">
+                                <span class="btn-text">Dokončit registraci 🚀</span>
+                                <span class="loader hidden"></span>
+                            </button>
+                        </form>
+                    </div>
+                    
+
+
+                    <!-- Karta kapacity -->
+                    <div class="capacity-card glass">
+                        <div class="card-header">
+                            <span class="card-icon">⚡</span>
+                            <h3>Aktuální volná místa</h3>
+                        </div>
+                        <p class="card-subtitle">Kapacita jednotlivých prohlídek je omezená. Doporučujeme včasnou registraci.</p>
+                        
+                        <div class="slots-list" id="slots-capacity-list">
+                            <!-- Načteno dynamicky z backendu -->
+                            <div class="slot-item skeleton"></div>
+                            <div class="slot-item skeleton"></div>
+                            <div class="slot-item skeleton"></div>
+                            <div class="slot-item skeleton"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Karta Programu -->
+                    <div class="program-card glass">
+                        <div class="card-header">
+                            <span class="card-icon">📅</span>
+                            <h3>Program DOD</h3>
+                        </div>
+                        <ul class="program-steps">
+                            <li>
+                                <div class="step-time">Celý den</div>
+                                <div class="step-desc">Individuální prohlídky budov, moderních laboratoří a odborných učeben. Zodpovídání dotazů k přijímačkám.</div>
+                            </li>
+                            <li>
+                                <div class="step-time">Každou hodinu</div>
+                                <div class="step-desc">Prezentace vedení školy o studijních oborech v aule. Chat se stávajícími studenty.</div>
+                            </li>
+                            <li>
+                                <div class="step-time">Praktické ukázky</div>
+                                <div class="step-desc">Ukázka virtuální reality, programování robotů, 3D tisku a chemických experimentů.</div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- TICKET MODAL (Digitální vstupenka) -->
+                <div id="ticket-modal" class="modal hidden">
+                    <div class="modal-content glass animate-scale">
+                        <div class="modal-header-success">
+                            <div class="success-icon">🎉</div>
+                            <h4>Registrace byla úspěšná!</h4>
+                            <p>Zde je vaše digitální vstupenka na Den otevřených dveří.</p>
+                        </div>
+                        
+                        <!-- Vstupenka -->
+                         <div class="ticket-widget" id="ticket-print-area">
+                            <div class="ticket-top" style="display: flex; justify-content: space-between; align-items: center;">
+                                <div class="ticket-logo" style="display: flex; align-items: center; gap: 8px;">
+                                    <img src="/static/logo.png" alt="Logo SŠ André Citroëna" style="height: 24px; width: 24px; object-fit: contain; flex-shrink: 0; border-radius: 3px;">
+                                    <span style="font-weight: 800; font-size: 1.05rem; letter-spacing: 0.5px; color: #ffffff;">SŠ A. Citroëna</span>
+                                </div>
+                                <div class="ticket-title" style="letter-spacing: 1px;">DIGITÁLNÍ VSTUPENKA</div>
+                            </div>
+                            
+                            <div class="ticket-body">
+                                <div class="ticket-left">
+                                    <div class="ticket-field">
+                                        <span class="ticket-label">NÁVŠTĚVNÍK</span>
+                                        <span class="ticket-value" id="ticket-visitor-name">Jan Novák</span>
+                                    </div>
+                                    <div class="ticket-field">
+                                        <span class="ticket-label">SKUPINA</span>
+                                        <span class="ticket-value" id="ticket-visitor-group">Student</span>
+                                    </div>
+                                    <div class="ticket-field">
+                                        <span class="ticket-label">TERMÍN DOD</span>
+                                        <span class="ticket-value" id="ticket-visitor-date">13. října 2026</span>
+                                    </div>
+                                    <div class="ticket-field">
+                                        <span class="ticket-label">ČASOVÝ SLOT</span>
+                                        <span class="ticket-value" id="ticket-visitor-slot">09:00</span>
+                                    </div>
+                                    <div class="ticket-double-fields" style="display: grid; grid-template-columns: 1fr 1.2fr; gap: 12px; margin-bottom: 5px;">
+                                        <div class="ticket-field">
+                                            <span class="ticket-label">DOPROVOD</span>
+                                            <span class="ticket-value-small" style="font-weight:700;" id="ticket-visitor-accompanying">0 osob</span>
+                                        </div>
+                                        <div class="ticket-field">
+                                            <span class="ticket-label">PROHLÍDKA</span>
+                                            <span class="ticket-value-small" style="font-weight:700;" id="ticket-visitor-tour-type">Skupinová</span>
+                                        </div>
+                                    </div>
+                                    <div class="ticket-field" style="margin-bottom: 5px;">
+                                        <span class="ticket-label">DOPLŇKOVÉ PROHLÍDKY</span>
+                                        <span class="ticket-value-small" style="font-weight:700; line-height: 1.3;" id="ticket-visitor-addons">Žádné doplňky</span>
+                                    </div>
+                                    <div class="ticket-field">
+                                        <span class="ticket-label">OBORY ZÁJMU</span>
+                                        <span class="ticket-value-small" id="ticket-visitor-interests">Informační technologie, Přírodní vědy</span>
+                                    </div>
+                                </div>
+                                <div class="ticket-right">
+                                    <!-- QR KÓD jako SVG -->
+                                    <div class="qr-code-container">
+                                        <svg class="qr-svg" viewBox="0 0 100 100">
+                                            <!-- Obvodový rámeček a rohy QR kódu -->
+                                            <rect x="0" y="0" width="100" height="100" fill="var(--bg-ticket-qr)" />
+                                            <!-- Finder patterns (tři velké čtverce v rozích) -->
+                                            <rect x="10" y="10" width="25" height="25" fill="currentColor" />
+                                            <rect x="15" y="15" width="15" height="15" fill="var(--bg-ticket-qr)" />
+                                            <rect x="18" y="18" width="9" height="9" fill="currentColor" />
+                                            
+                                            <rect x="65" y="10" width="25" height="25" fill="currentColor" />
+                                            <rect x="70" y="15" width="15" height="15" fill="var(--bg-ticket-qr)" />
+                                            <rect x="73" y="18" width="9" height="9" fill="currentColor" />
+                                            
+                                            <rect x="10" y="65" width="25" height="25" fill="currentColor" />
+                                            <rect x="15" y="70" width="15" height="15" fill="var(--bg-ticket-qr)" />
+                                            <rect x="18" y="73" width="9" height="9" fill="currentColor" />
+                                            
+                                            <!-- Náhodný vzor imitující QR data -->
+                                            <rect x="45" y="15" width="5" height="5" fill="currentColor" />
+                                            <rect x="50" y="25" width="5" height="10" fill="currentColor" />
+                                            <rect x="40" y="35" width="10" height="5" fill="currentColor" />
+                                            <rect x="55" y="10" width="5" height="15" fill="currentColor" />
+                                            <rect x="45" y="45" width="15" height="5" fill="currentColor" />
+                                            
+                                            <rect x="15" y="45" width="5" height="5" fill="currentColor" />
+                                            <rect x="25" y="50" width="10" height="5" fill="currentColor" />
+                                            <rect x="35" y="40" width="5" height="15" fill="currentColor" />
+                                            
+                                            <rect x="70" y="45" width="15" height="5" fill="currentColor" />
+                                            <rect x="65" y="55" width="5" height="15" fill="currentColor" />
+                                            <rect x="80" y="65" width="10" height="10" fill="currentColor" />
+                                            <rect x="45" y="65" width="15" height="5" fill="currentColor" />
+                                            <rect x="55" y="75" width="10" height="5" fill="currentColor" />
+                                            <rect x="45" y="80" width="5" height="10" fill="currentColor" />
+                                            <rect x="70" y="80" width="15" height="5" fill="currentColor" />
+                                        </svg>
+                                    </div>
+                                    <div class="ticket-id-badge" id="ticket-visitor-id">DOD-A7B2</div>
+                                </div>
+                            </div>
+                            
+                            <div class="ticket-footer">
+                                <span>Při vstupu ukažte tento kód (v mobilu nebo vytištěný)</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Akce modálu -->
+                        <div class="modal-actions">
+                            <button id="btn-print-ticket" class="btn-secondary">🖨️ Vytisknout / Uložit</button>
+                            <button id="btn-email-ticket" class="btn-secondary">✉️ Odeslat na e-mail</button>
+                            <button id="btn-close-ticket" class="btn-primary">Rozumím a zavřít</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- SECTION 2: ADMINISTRAČNÍ PANEL -->
+            <section id="admin-view" class="view-section">
+                
+                <!-- Statistický přehled (Widgets Grid) -->
+                <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));">
+                    <!-- Widget 1: Registrovaní hl. návštěvníci -->
+                    <div class="stat-widget glass">
+                        <div class="widget-icon-bg bg-blue">👤</div>
+                        <div class="widget-info">
+                            <span class="widget-label">Registrované přihlášky</span>
+                            <h3 id="stat-total" class="widget-value">0</h3>
+                            <small class="widget-trend">Hlavní návštěvníci</small>
+                        </div>
+                    </div>
+                    
+                    <!-- Widget 2: Celkem fyzických osob -->
+                    <div class="stat-widget glass">
+                        <div class="widget-icon-bg bg-blue" style="background:var(--secondary-glow); color:var(--secondary); border-color:rgba(var(--secondary-rgb), 0.25)">👨‍👩‍👦</div>
+                        <div class="widget-info">
+                            <span class="widget-label">Celkem fyzických osob</span>
+                            <h3 id="stat-physical" class="widget-value">0</h3>
+                            <small class="widget-trend" id="stat-accompanying-sum">Včetně 0 doprovodů</small>
+                        </div>
+                    </div>
+                    
+                    <!-- Widget 3: Doplňkové zájmy -->
+                    <div class="stat-widget glass">
+                        <div class="widget-info" style="display:flex; flex-direction:column; gap:5px;">
+                            <span class="widget-label">Doplňkové zájmy</span>
+                            <div style="display:flex; justify-content:space-between; font-size:0.83rem; font-weight:600;">
+                                <span>👦 DM pro kluky:</span>
+                                <span id="stat-dormitory-boys-count" style="color:var(--secondary);">0</span>
+                            </div>
+                            <div style="display:flex; justify-content:space-between; font-size:0.83rem; font-weight:600;">
+                                <span>👧 DM pro holky:</span>
+                                <span id="stat-dormitory-girls-count" style="color:var(--secondary);">0</span>
+                            </div>
+                            <div style="display:flex; justify-content:space-between; font-size:0.83rem; font-weight:600;">
+                                <span>⚙️ Dřevařská (CNC):</span>
+                                <span id="stat-workplace-drevarska-count" style="color:var(--secondary);">0</span>
+                            </div>
+                            <div style="display:flex; justify-content:space-between; font-size:0.83rem; font-weight:600;">
+                                <span>📍 Skalice n. Svit.:</span>
+                                <span id="stat-workplace-skalice-count" style="color:var(--secondary);">0</span>
+                            </div>
+                            <div style="display:flex; justify-content:space-between; font-size:0.83rem; font-weight:600; margin-top:2px; border-top:1px solid var(--border-color); padding-top:2px;">
+                                <span>🧩 Speciální potřeby (SVP):</span>
+                                <span id="stat-svp-count" style="color:var(--rose);">0</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Widget 4: Odbavení -->
+                    <div class="stat-widget glass">
+                        <div class="widget-icon-bg bg-green">✅</div>
+                        <div class="widget-info">
+                            <span class="widget-label">Odbaveno u vstupu</span>
+                            <h3 id="stat-checked" class="widget-value">0</h3>
+                            <small class="widget-trend" id="stat-checked-sub">0 % z celku</small>
+                        </div>
+                        <!-- Progress Ring -->
+                        <div class="progress-ring-container">
+                            <svg class="progress-ring" width="60" height="60">
+                                <circle class="progress-ring-circle-bg" stroke="var(--border-color)" stroke-width="6" fill="transparent" r="22" cx="30" cy="30" />
+                                <circle id="stat-progress-ring" class="progress-ring-circle" stroke="var(--emerald)" stroke-width="6" fill="transparent" r="22" cx="30" cy="30" stroke-dasharray="138.2" stroke-dashoffset="138.2" />
+                            </svg>
+                            <span id="stat-progress-txt" class="progress-txt">0%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tlačítka rychlého testování -->
+                <div style="display:flex; justify-content:flex-end; margin-bottom:20px; gap:10px;">
+                    <button id="btn-reset-db" class="btn-danger-outline" title="Znovu naplní databázi výchozími testovacími záznamy">
+                        🔄 Obnovit rozšířenou databázi
+                    </button>
+                </div>
+                
+                <!-- Grafy a Simulátor čtečky -->
+                <div class="admin-middle-row">
+                    <!-- Statistické grafy (Custom SVG) -->
+                    <div class="chart-card glass">
+                        <div class="card-header">
+                            <span class="card-icon">📊</span>
+                            <h3>Struktura zájemců</h3>
+                        </div>
+                        <div class="charts-container">
+                            <div class="chart-group">
+                                <h4>Skupiny návštěvníků</h4>
+                                <div class="svg-chart-wrapper" id="group-chart">
+                                    <!-- Generováno přes JS (SVG pruhy) -->
+                                </div>
+                            </div>
+                            <div class="chart-group">
+                                <h4>Zájem o obory</h4>
+                                <div class="svg-chart-wrapper" id="interest-chart">
+                                    <!-- Generováno přes JS -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Simulátor čtečky QR kódů -->
+                    <div class="scanner-card glass">
+                        <div class="card-header">
+                            <span class="card-icon">📷</span>
+                            <h3>Simulátor čtečky u vstupu</h3>
+                        </div>
+                        <p class="card-subtitle">Zadejte kód lístku (např. DOD-C9E1) a stiskněte Enter pro simulaci skenování.</p>
+                        
+                        <div class="scanner-interface">
+                            <div class="scanner-input-group">
+                                <input type="text" id="scan-input" placeholder="Zadejte kód (DOD-xxxx)" maxlength="8">
+                                <button id="btn-scan" class="btn-primary">Odbavit lístek</button>
+                            </div>
+                            
+                            <!-- Notifikační zóna skeneru -->
+                            <div id="scan-feedback" class="scan-feedback-box idle">
+                                <div class="scan-feedback-content">
+                                    <span class="scan-icon">📳</span>
+                                    <div class="scan-text">
+                                        <span class="scan-title">Čtečka připravena</span>
+                                        <span class="scan-sub">Čekám na kód...</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Hlavní tabulka návštěvníků -->
+                <div class="table-card glass">
+                    <div class="table-actions-header">
+                        <div class="table-title-group">
+                            <span class="card-icon">📋</span>
+                            <h3>Seznam registrovaných návštěvníků</h3>
+                        </div>
+                        <div class="table-buttons">
+                            <!-- Export dat -->
+                            <button id="btn-export-csv" class="btn-secondary">📥 Exportovat do CSV</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Filtry -->
+                    <div class="filters-bar">
+                        <!-- Vyhledávání -->
+                        <div class="filter-group flex-grow">
+                            <div class="input-wrapper search-wrapper">
+                                <span class="input-icon">🔍</span>
+                                <input type="text" id="filter-search" placeholder="Hledat jméno, e-mail, telefon nebo kód lístku...">
+                            </div>
+                        </div>
+                        
+                        <!-- Filtr Skupina -->
+                        <div class="filter-group">
+                            <select id="filter-group" class="custom-select">
+                                <option value="Všechny">Všechny skupiny</option>
+                                <option value="Student">Studenti</option>
+                                <option value="Rodič">Rodiče</option>
+                                <option value="Někdo jiný">Někdo jiný</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Filtr Časový slot -->
+                        <div class="filter-group">
+                            <select id="filter-slot" class="custom-select">
+                                <option value="Všechny">Všechny sloty</option>
+                                <option value="09:00">09:00</option>
+                                <option value="09:15">09:15</option>
+                                <option value="09:30">09:30</option>
+                                <option value="09:45">09:45</option>
+                                <option value="10:00">10:00</option>
+                                <option value="10:15">10:15</option>
+                                <option value="10:30">10:30</option>
+                                <option value="10:45">10:45</option>
+                                <option value="11:00">11:00</option>
+                                <option value="11:15">11:15</option>
+                                <option value="11:30">11:30</option>
+                                <option value="11:45">11:45</option>
+                                <option value="12:00">12:00</option>
+                                <option value="12:15">12:15</option>
+                                <option value="12:30">12:30</option>
+                                <option value="12:45">12:45</option>
+                                <option value="13:00">13:00</option>
+                                <option value="13:15">13:15</option>
+                                <option value="13:30">13:30</option>
+                                <option value="13:45">13:45</option>
+                                <option value="14:00">14:00</option>
+                                <option value="14:15">14:15</option>
+                                <option value="14:30">14:30</option>
+                                <option value="14:45">14:45</option>
+                                <option value="15:00">15:00</option>
+                                <option value="15:15">15:15</option>
+                                <option value="15:30">15:30</option>
+                                <option value="15:45">15:45</option>
+                                <option value="16:00">16:00</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Filtr Stav -->
+                        <div class="filter-group">
+                            <select id="filter-status" class="custom-select">
+                                <option value="all">Všechny stavy</option>
+                                <option value="registered">Pouze registrovaní</option>
+                                <option value="checked_in">Pouze odbavení</option>
+                            </select>
+                        </div>
+
+
+
+                        <!-- NOVÉ FILTRY PODLE REŠERŠE -->
+                        <!-- Filtr Prohlídka -->
+                        <div class="filter-group">
+                            <select id="filter-tour-type" class="custom-select">
+                                <option value="all">Všechny prohlídky</option>
+                                <option value="Skupinová">Skupinové</option>
+                                <option value="Individuální">Individuální</option>
+                            </select>
+                        </div>
+
+                        <!-- Filtr Doplňkové zájmy -->
+                        <div class="filter-group">
+                            <select id="filter-dormitory" class="custom-select">
+                                <option value="all">Všechny doplňkové zájmy</option>
+                                <option value="boys">👦 DM pro kluky</option>
+                                <option value="girls">👧 DM pro holky</option>
+                                <option value="drevarska">⚙️ Pracoviště Dřevařská</option>
+                                <option value="skalice">📍 Pracoviště Skalice</option>
+                                <option value="any">✨ S jakoukoliv prohlídkou</option>
+                                <option value="none">❌ Bez doplňkových prohlídek</option>
+                            </select>
+                        </div>
+
+                        <!-- Filtr SVP -->
+                        <div class="filter-group">
+                            <select id="filter-svp" class="custom-select">
+                                <option value="all">SVP status (vše)</option>
+                                <option value="1">Pouze SVP</option>
+                                <option value="0">Bez SVP</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <!-- Responzivní obal tabulky -->
+                    <div class="table-responsive">
+                        <table class="data-table" id="visitors-table">
+                            <thead>
+                                <tr>
+                                    <th>Kód lístku</th>
+                                    <th>Jméno a příjmení</th>
+                                    <th>Kontakt / Škola</th>
+                                    <th>Skupina / Ročník</th>
+                                    <th>Čas a typ prohlídky</th>
+                                    <th>Obory zájmu</th>
+                                    <th>Stav</th>
+                                    <th class="text-right">Akce</th>
+                                </tr>
+                            </thead>
+                            <tbody id="visitors-table-body">
+                                <!-- Načteno přes JS z backendu -->
+                                <tr>
+                                    <td colspan="8" class="text-center">Načítám data z databáze...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </main>
+        
+        <!-- Patička -->
+        <footer class="main-footer">
+            <p>&copy; 2026 Střední škola André Citroëna Boskovice. Všechna práva vyhrazena.</p>
+            <p class="footer-note">Vytvořeno jako součást praktického vývoje informačních systémů.</p>
+        </footer>
+        
+    </div>
+    
+    <!-- JavaScripty -->
+    <script src="/static/js/soundEffects.js"></script>
+    <script src="/static/js/app.js"></script>
+</body>
+</html>

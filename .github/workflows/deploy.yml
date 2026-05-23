@@ -1,0 +1,27 @@
+name: Continuous Deployment to PythonAnywhere
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Deploy to PythonAnywhere via SSH
+        uses: appleboy/ssh-action@master
+        with:
+          host: ssh.pythonanywhere.com
+          username: ${{ secrets.PA_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+            cd ~/open-doors-registration
+            git pull origin main
+            source venv/bin/activate
+            pip install -r requirements.txt
+            touch /var/www/${{ secrets.PA_USERNAME }}_pythonanywhere_com_wsgi.py
