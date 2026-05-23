@@ -509,43 +509,9 @@
                                     </div>
                                 </div>
                                 <div class="ticket-right">
-                                    <!-- QR KÓD jako SVG -->
-                                    <div class="qr-code-container">
-                                        <svg class="qr-svg" viewBox="0 0 100 100">
-                                            <!-- Obvodový rámeček a rohy QR kódu -->
-                                            <rect x="0" y="0" width="100" height="100" fill="var(--bg-ticket-qr)" />
-                                            <!-- Finder patterns (tři velké čtverce v rozích) -->
-                                            <rect x="10" y="10" width="25" height="25" fill="currentColor" />
-                                            <rect x="15" y="15" width="15" height="15" fill="var(--bg-ticket-qr)" />
-                                            <rect x="18" y="18" width="9" height="9" fill="currentColor" />
-                                            
-                                            <rect x="65" y="10" width="25" height="25" fill="currentColor" />
-                                            <rect x="70" y="15" width="15" height="15" fill="var(--bg-ticket-qr)" />
-                                            <rect x="73" y="18" width="9" height="9" fill="currentColor" />
-                                            
-                                            <rect x="10" y="65" width="25" height="25" fill="currentColor" />
-                                            <rect x="15" y="70" width="15" height="15" fill="var(--bg-ticket-qr)" />
-                                            <rect x="18" y="73" width="9" height="9" fill="currentColor" />
-                                            
-                                            <!-- Náhodný vzor imitující QR data -->
-                                            <rect x="45" y="15" width="5" height="5" fill="currentColor" />
-                                            <rect x="50" y="25" width="5" height="10" fill="currentColor" />
-                                            <rect x="40" y="35" width="10" height="5" fill="currentColor" />
-                                            <rect x="55" y="10" width="5" height="15" fill="currentColor" />
-                                            <rect x="45" y="45" width="15" height="5" fill="currentColor" />
-                                            
-                                            <rect x="15" y="45" width="5" height="5" fill="currentColor" />
-                                            <rect x="25" y="50" width="10" height="5" fill="currentColor" />
-                                            <rect x="35" y="40" width="5" height="15" fill="currentColor" />
-                                            
-                                            <rect x="70" y="45" width="15" height="5" fill="currentColor" />
-                                            <rect x="65" y="55" width="5" height="15" fill="currentColor" />
-                                            <rect x="80" y="65" width="10" height="10" fill="currentColor" />
-                                            <rect x="45" y="65" width="15" height="5" fill="currentColor" />
-                                            <rect x="55" y="75" width="10" height="5" fill="currentColor" />
-                                            <rect x="45" y="80" width="5" height="10" fill="currentColor" />
-                                            <rect x="70" y="80" width="15" height="5" fill="currentColor" />
-                                        </svg>
+                                    <!-- Realný QR KÓD generovaný přes API -->
+                                    <div class="qr-code-container" style="background: #ffffff; padding: 4px;">
+                                        <img id="ticket-qr-image" src="" alt="QR kód lístku" style="width: 100%; height: 100%; object-fit: contain;">
                                     </div>
                                     <div class="ticket-id-badge" id="ticket-visitor-id">DOD-A7B2</div>
                                 </div>

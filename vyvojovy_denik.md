@@ -713,6 +713,32 @@ V databázovém schématu (soubor `app.py`) byl do tabulky `visitors` přidán n
 
 Tato integrace završuje funkční možnosti specifických zájmů a poskytuje kompletní, robustně ošetřenou funkcionalitu, která odpovídá standardům moderního podnikového vývoje.
 
+### 8.7 Dynamické generování plně skenovatelných QR kódů (QR Code API Integration)
+
+Pro zásadní zvýšení autentičnosti, praktické využitelnosti a technologické hodnoty celého systému byla v rámci finální optimalizace nahrazena původní statická vektorová maketa QR kódu (která sloužila pouze jako estetický placeholder) **plně funkčním, dynamicky generovaným QR kódem**. 
+
+Tento krok bezprostředně reaguje na praktickou potřebu ověřování vstupenek u vstupu na Den otevřených dveří pomocí běžných mobilních telefonů nebo hardwarových čteček.
+
+#### 1. Architektonické a technické řešení
+Při volbě technologie pro generování QR kódů byl kladen důraz na rychlost, bezpečnost a minimalizaci závislostí, které by zbytečně zvětšovaly velikost klientského balíčku (frontend bundle). Bylo zvoleno využití osvědčeného, celosvětově dostupného a bezplatného REST rozhraní **QR Code Generator API** (`api.qrserver.com`).
+
+Integrace probíhá plně na straně klienta (Client-Side Rendering):
+- **Náhrada šablony (`index.html`)**: Původní složitý statický element `<svg>` s pevně vykreslenou strukturou imitující QR kód byl odstraněn. Místo něj byl do `.qr-code-container` vložen standardní element `<img>` s unikátním identifikátorem `id="ticket-qr-image"`.
+- **Styling a scan-friendly optimalizace (`style.css` / inline styly)**: Pro zajištění bezproblémové čitelnosti všemi typy mobilních čteček a fotoaparátů (které vyžadují vysoký kontrast a tzv. *quiet zone* neboli bílý okraj kolem kódu) byl kontejneru nastaven čistě bílý podklad (`style="background: #ffffff;"`), vnitřní odsazení (`padding: 4px`) a styl zamezující ořezání okrajů (`object-fit: contain;`).
+- **Dynamické sestavení URL (`app.js`)**: Ve funkci `showTicket(visitor)` po úspěšném dokončení registrace klientský skript vygeneruje adresu požadavku s parametry velikosti a zakódovaného textu (kterým je unikátní kód lístku, např. `DOD-A7B2`):
+  ```javascript
+  qrImage.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(visitor.id)}`;
+  ```
+
+#### 2. Praktické nasazení a integrační tok (QR Check-in Flow)
+Zavedením reálného QR kódu byl kompletně uzavřen a zprovozněn logistický proces odbavení návštěvníků:
+1. **Registrace**: Uživatel vyplní formulář a dokončí registraci.
+2. **Obdržení lístku**: Zobrazí se digitální vstupenka s reálným QR kódem a kódem lístku (např. `DOD-F4D9`).
+3. **Skenování u vstupu**: Administrátor u vstupu pomocí běžného chytrého telefonu (nativní aplikací Fotoaparát) naskenuje QR kód z displeje návštěvníka. Telefon kód okamžitě přečte a rozpozná jako textový řetězec `DOD-F4D9`.
+4. **Odbavení v systému**: Administrátor má otevřený administrační panel systému, kde se kurzor nachází v textovém poli simulátoru čtečky. Po načtení nebo zadání kódu systém okamžitě přes API endpoint `/api/checkin/DOD-F4D9` provede ověření vůči SQLite databázi, změní stav návštěvníka na „Odbaven“, přehraje úspěšný zvukový tón a aktualizuje statistiky na dashboardu.
+
+Tato inovace povyšuje informační systém ze stavu vizuálního prototypu do stavu **plně nasaditelného podnikového řešení** a představuje vynikající technologický prvek pro praktickou obhajobu závěrečné práce.
+
 ---
 
 ## 9. Cloudový hosting a okamžité spuštění pro veřejnost (PythonAnywhere)

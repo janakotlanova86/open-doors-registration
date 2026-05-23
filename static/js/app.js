@@ -399,6 +399,12 @@ const App = {
         document.getElementById('ticket-visitor-interests').innerText = interestsStr;
         document.getElementById('ticket-visitor-id').innerText = visitor.id;
 
+        // Generování reálného skenovatelného QR kódu přes spolehlivé veřejné API
+        const qrImage = document.getElementById('ticket-qr-image');
+        if (qrImage) {
+            qrImage.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(visitor.id)}`;
+        }
+
         const modal = document.getElementById('ticket-modal');
         modal.classList.remove('hidden');
     },
