@@ -947,6 +947,29 @@ V rámci zkušebního provozu a optimalizace logistických procesů Dne otevřen
    - Při pokusu o uložení nové registrace backend nejprve sečte aktuální počet lidí v daném slotu a přičte k nim velikost nově registrované skupiny (`1 + accompanying_count`).
    - Pokud by součet překročil limit 30 fyzických osob, registrace je bezpečně stornována a uživateli je vráceno jasné vysvětlení (např. *„Nelze provést registraci. Kapacita časového slotu '09:00' by byla překročena. Volná místa: 5, vy požadujete: 11.“*). To zamezuje jakémukoli kapacitnímu přetížení a zmatkům na chodbách školy André Citroëna.
 
+### 10.7 Možnosti budoucího rozvoje a rozšíření systému (Future Scope)
+Přestože je aplikace v současném stavu plně dokončená, stabilní a připravená k okamžitému ostrému nasazení na SŠ André Citroëna Boskovice, existuje několik směrů, kterými by se mohl ubírat její budoucí rozvoj. Zahrnutí těchto vizionářských bodů do závěrečné práce ukazuje schopnost autorky uvažovat o životním cyklu softwaru a plánovat jeho další rozšiřování:
+
+1. **Integrovaný skener QR kódů přímo v prohlížeči (Webcam QR Scanner)**:
+   - *Současný stav*: Odbavení čtečkou u vstupu funguje přes textový vstup (ideální pro externí USB/Bluetooth skener v režimu emulace klávesnice nebo ruční psaní).
+   - *Rozšíření*: Integrace lehké JavaScriptové knihovny pro zpracování obrazu (např. `html5-qrcode` nebo `jsQR`) přímo do klientského rozhraní administrace. Studenti-průvodci by tak mohli kliknout na tlačítko *„Skenovat fotoaparátem“* a odbavovat lístky návštěvníků přímo pomocí vestavěné kamery svého mobilního telefonu či tabletu. Tím by odpadla jakákoli nutnost nákupu dodatečného hardwaru a zvýšila by se mobilita obsluhy.
+
+2. **Reálné e-mailové notifikace (SMTP Server Integration)**:
+   - *Současný stav*: Tlačítko pro odeslání vstupenky na e-mail funguje v režimu bezpečné a realistické simulace na frontendu.
+   - *Rozšíření*: Propojení Flask backendu s produkčním SMTP serverem (např. školním poštovním serverem nebo bezplatnými cloudovými službami jako SendGrid / Mailgun) pomocí knihovny `Flask-Mail`. Po registraci by systém na pozadí asynchronně vygeneroval a odeslal skutečný e-mail s lístkem a QR kódem jako přílohu, což by zvýšilo uživatelský komfort návštěvníků.
+
+3. **Grafický PDF report statistik pro vedení školy (PDF Report Generator)**:
+   - *Současný stav*: Administrace nabízí stažení všech dat ve formátu CSV, který lze otevřít v MS Excel.
+   - *Rozšíření*: Integrace PDF generátoru na backendu (např. pythonovských knihoven `ReportLab`, `pdfkit` nebo `WeasyPrint`). Administrátor by si mohl na jedno kliknutí stáhnout reprezentativní, plně ostylovanou tiskovou sestavu v barvách a s logem školy. Tato sestava by obsahovala přehledné grafy a souhrnné statistiky zájmu o obory a ubytování, což by sloužilo jako podklad pro poradu vedení školy a plánování kapacit učitelů.
+
+4. **Časová vizualizace trendů registrací (Analytics Dashboard)**:
+   - *Současný stav*: Grafy ukazují agregované zájmy o jednotlivé obory a skupiny návštěvníků.
+   - *Rozšíření*: Doplnění administrace o časový graf (křivku), který by vizualizoval rychlost a dynamiku registrací v čase (dny/týdny) před Dnem otevřených dveří. To by marketingovému oddělení školy umožnilo přesně analyzovat úspěšnost náborových kampaní na spádových základních školách (např. sledovat nárůst registrací po uskutečněné prezentaci školy na dané ZŠ).
+
+5. **Interaktivní navigátor stanovišť na lístku (Smart School Map)**:
+   - *Současný stav*: Digitální lístek zobrazuje seznam vybraných oborů a doplňkových prohlídek.
+   - *Rozšíření*: Generování zjednodušeného plánku budovy (např. interaktivní SVG mapka školy) přímo na lístku. Na základě oborů, o které uchazeč vyjádřil zájem, by se na plánku školy zvýraznila konkrétní stanoviště a učebny (např. autodílny pro zájemce o Autotronika, nebo IT učebna pro zájemce o IT obor). To by usnadnilo orientaci v areálu školy a dodalo projektu další moderní prvek.
+
 Tato kapitola uzavírá vývojový deník a jasně demonstruje, že systém je plně připraven k praktickému nasazení a plní veškeré požadavky kladené na moderní, robustní, legislativně vyhovující a bezpečné webové řešení pro potřeby střední školy.
 
 
