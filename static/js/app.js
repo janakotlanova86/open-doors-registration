@@ -381,7 +381,11 @@ const App = {
             { id: 'form-name', validator: val => val.trim().length >= 3, errorId: 'error-name' },
             { id: 'form-email', validator: val => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val.trim()), errorId: 'error-email' },
             { id: 'form-phone', validator: val => /^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\./0-9]*$/.test(val.trim()) && val.trim().length >= 9, errorId: 'error-phone' },
-            { id: 'form-slot', validator: val => val !== '', errorId: 'error-slot' }
+            { id: 'form-slot', validator: val => val !== '', errorId: 'error-slot' },
+            { id: 'form-accompanying', validator: val => {
+                const num = parseInt(val);
+                return !isNaN(num) && num >= 0 && num <= 15;
+            }, errorId: 'error-accompanying' }
         ];
 
         fields.forEach(field => {

@@ -419,6 +419,10 @@ def register_visitor():
         if not name or not email or not phone or not visitor_group or not time_slot:
             return jsonify({"status": "error", "message": "Všechna povinná pole musí být vyplněna."}), 400
             
+        # Validace maximálního doprovodu na jednu registraci
+        if accompanying_count < 0 or accompanying_count > 15:
+            return jsonify({"status": "error", "message": "Počet doprovázejících osob na jednu registraci nesmí překročit 15."}), 400
+            
         # Zabezpečení kapacity časového slotu pro dané datum (celkový počet fyzických osob včetně doprovodu)
         conn = get_db_connection()
         cursor = conn.cursor()
