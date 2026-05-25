@@ -40,6 +40,9 @@ const App = {
 
         // Prvotní načtení dat pro veřejnou část (kapacity slotů)
         this.loadSlotCapacities();
+
+        // Inicializace Často kladených dotazů (FAQ)
+        this.initFaq();
     },
 
     /* ==========================================================================
@@ -174,6 +177,35 @@ const App = {
         // První spuštění a nastavení intervalu
         updateTimer();
         const timerInterval = setInterval(updateTimer, 1000);
+    },
+
+    initFaq() {
+        const faqQuestions = document.querySelectorAll('.faq-question');
+        faqQuestions.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const item = btn.closest('.faq-item');
+                const answer = item.querySelector('.faq-answer');
+                const arrow = item.querySelector('.faq-arrow');
+                const isOpen = item.classList.contains('active');
+
+                // Zavřít všechny ostatní dotazy (akordeon efekt)
+                document.querySelectorAll('.faq-item').forEach(otherItem => {
+                    otherItem.classList.remove('active');
+                    otherItem.querySelector('.faq-answer').style.maxHeight = '0px';
+                    otherItem.querySelector('.faq-arrow').style.transform = 'rotate(0deg)';
+                    otherItem.style.background = 'rgba(255, 255, 255, 0.02)';
+                    otherItem.style.borderColor = 'var(--border-color)';
+                });
+
+                if (!isOpen) {
+                    item.classList.add('active');
+                    answer.style.maxHeight = answer.scrollHeight + 'px';
+                    arrow.style.transform = 'rotate(180deg)';
+                    item.style.background = 'rgba(255, 255, 255, 0.04)';
+                    item.style.borderColor = 'rgba(var(--primary-rgb), 0.3)';
+                }
+            });
+        });
     },
 
     /* ==========================================================================
