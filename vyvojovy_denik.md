@@ -916,6 +916,37 @@ Vzhledem k tomu, že systém pracuje s reálnými osobními údaji uchazečů (j
    - Výchozím přihlašovacím heslem pro SŠ André Citroëna bylo zvoleno **`Citroen2026`**.
    - Po úspěšném asynchronním ověření hesla vůči endpointu `/api/admin/auth` se heslo bezpečně uloží do relace prohlížeče (`sessionStorage`, takže se při zavření tabu/prohlížeče automaticky vymaže a zóna se bezpečně uzamkne) a uživatel je hladce přenesen do hlavního administračního panelu za doprovodu potvrzovacího akustického tónu. V případě chyby se okamžitě zobrazí zřetelná červená notifikace o neplatném hesle.
 
+### 10.6 Zvýšení limitů a inteligentní dvoufázová kontrola obsazenosti (Fyzická kapacita)
+V rámci zkušebního provozu a optimalizace logistických procesů Dne otevřených dveří vyvstal klíčový požadavek na flexibilitu skupinových registrací a přesnost plánování reálné zaplněnosti budovy. Původní zjednodušený model, který počítal pouze počet registrovaných přihlášek bez ohledu na počet doprovázejících osob (rodinných příslušníků, přátel apod.), byl kompletně přepracován a povýšen na robustní systém řízení fyzických kapacit:
+
+1. **Navýšení provozních limitů**:
+   - **Počet osob v doprovodu**: Původní limit 5 doprovázejících osob na jednu registraci byl zvednut na **maximálně 15 osob**. To umožňuje jedné přihlášce reprezentovat ucelenou skupinu (např. menší třídu z jedné základní školy či velkou rodinu) čítající až **16 fyzických účastníků** (1 hlavní registrovaný + 15 doprovodů).
+   - **Kapacita časového slotu (`MAX_CAPACITY_PER_SLOT`)**: Aby větší skupiny nezablokovaly časový slot pro ostatní uchazeče, byla celková kapacita jednoho slotu navýšena **z 15 na 30 fyzických osob**.
+
+2. **Přesný matematický model obsazenosti (SQL úroveň)**:
+   - Namísto jednoduchého sčítání řádků pomocí `COUNT(*)`, které vedlo k organizačním zmatkům (kdy se sice registrovalo 15 lidí, ale každý si vzal 4 doprovody, čímž vznikl zástup 75 lidí v jeden moment), systém nově sčítá **skutečný počet fyzických osob**.
+   - V souboru `app.py` byl dotaz na obsazenost časových slotů implementován pomocí agregační funkce sčítající doprovázející osoby navýšené o samotného přihlášeného: `SUM(coalesce(accompanying_count, 0) + 1)`. Tím se do statistik dashboardu i do veřejné klientské tabulky volných míst propisují reálné a fyzicky přítomné kapacity.
+
+3. **Striktní dvoufázová validace limitu doprovodu**:
+   - *Problém obcházení limitů*: Pouhé nastavení HTML atributu `max="15"` u číselného pole zabrání klikání na ovládací šipky nad 15, ale nebrání uživateli vepsat do pole z klávesnice libovolné vyšší číslo (např. 17).
+   - *Klientské ošetření (JavaScript)*: Do validačního schématu formuláře v [app.js](file:///c:/Users/kotlanova/.gemini/antigravity-ide/scratch/open-doors-registration/static/js/app.js) byl přidán nový klientský validátor:
+     ```javascript
+     { id: 'form-accompanying', validator: val => {
+         const num = parseInt(val);
+         return !isNaN(num) && num >= 0 && num <= 15;
+     }, errorId: 'error-accompanying' }
+     ```
+     Pod číselné pole v [index.html](file:///c:/Users/kotlanova/.gemini/antigravity-ide/scratch/open-doors-registration/templates/index.html) byl zároveň integrován skrytý chybový popisek `<span class="error-msg" id="error-accompanying">Maximální počet doprovodů je 15.</span>`. Jakmile uživatel vepíše hodnotu vyšší než 15, pole se zbarví červeně, zobrazí se chybová zpráva a odesílací tlačítko se zablokuje.
+   - *Serverové ošetření (Python/Flask)*: Pokud by se přesto nevalidní požadavek dostal až na server, backend v registračním endpointu `/api/register` hodnotu striktně přezkoumá a zamítne ji chybovým stavovým kódem `400 Bad Request`:
+     ```python
+     if accompanying_count < 0 or accompanying_count > 15:
+         return jsonify({"status": "error", "message": "Počet doprovázejících osob na jednu registraci nesmí překročit 15."}), 400
+     ```
+
+4. **Prevence přeplnění slotů při registraci**:
+   - Při pokusu o uložení nové registrace backend nejprve sečte aktuální počet lidí v daném slotu a přičte k nim velikost nově registrované skupiny (`1 + accompanying_count`).
+   - Pokud by součet překročil limit 30 fyzických osob, registrace je bezpečně stornována a uživateli je vráceno jasné vysvětlení (např. *„Nelze provést registraci. Kapacita časového slotu '09:00' by byla překročena. Volná místa: 5, vy požadujete: 11.“*). To zamezuje jakémukoli kapacitnímu přetížení a zmatkům na chodbách školy André Citroëna.
+
 Tato kapitola uzavírá vývojový deník a jasně demonstruje, že systém je plně připraven k praktickému nasazení a plní veškeré požadavky kladené na moderní, robustní, legislativně vyhovující a bezpečné webové řešení pro potřeby střední školy.
 
 
