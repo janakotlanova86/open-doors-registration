@@ -864,4 +864,49 @@ Vraťte se do sekce **Web** a nakonfigurujte následující pole:
 
 V tento moment je aplikace spuštěná na internetu! Kdokoliv má odkaz na adresu `https://uzivatelskejmeno.pythonanywhere.com`, se může zaregistrovat, vyzkoušet si check-in nebo procházet administraci, aniž by musel cokoliv lokálně instalovat. Databáze funguje zcela automaticky a stabilně.
 
+---
+
+## 10. Přechod od simulátoru k plně reálnému odbavení (Real-Time QR Reader)
+
+Zásadním evolučním krokem v rámci vývoje celého systému bylo opuštění konceptu „simulátoru“ a jeho transformace v **plně integrovanou, reálně fungující čtečku lístků u vstupu**. Tento přerod přináší kompletní provozní soběstačnost a umožňuje nasadit aplikaci přímo v ostrém provozu Dne otevřených dveří.
+
+### 10.1 Reálná integrace a generování QR kódů
+V dřívějších verzích obsahovala digitální vstupenka pouze vektorový náhled (SVG mock-up), který nebylo možné reálně číst fotoaparátem ani optickým skenerem. V rámci refaktorace bylo toto omezení odstraněno:
+1. **Dynamické generování QR kódů**: Propojením s veřejným generátorem QR kódů (`api.qrserver.com`) se po úspěšné registraci vygeneruje plnohodnotný, opticky čitelný QR kód typu 2D Matrix.
+2. **Datový obsah**: Do QR kódu je zakódován unikátní alfanumerický kód lístku (např. `DOD-C9E1`), který systém vygeneroval pro každého konkrétního návštěvníka.
+3. **Vysoká čitelnost**: Kontrastní zobrazení na displeji telefonu (s optimalizovaným bílým pozadím v rámci digitálního lístku) garantuje okamžité sejmutí i za zhoršených světelných podmínek u vstupu do školy.
+
+### 10.2 Přeměna rozhraní v administračním panelu
+Uživatelské rozhraní v sekci administrace bylo kompletně zbaveno jakýchkoliv odkazů na „simulaci“. Nyní se chová jako profesionální **Check-in terminál**:
+- **Změna terminologie**: Původní záhlaví *„Simulátor čtečky u vstupu“* bylo nahrazeno oficiálním názvem **„Čtečka lístků u vstupu“**.
+- **Nová ikonografie**: Ikona fotoaparátu `📷` byla nahrazena ikonou chytrého terminálu/mobilního skeneru `📱`.
+- **Aktualizované instrukce**: Podnadpis karty jasně navádí obsluhu: *„Naskenujte QR kód ze vstupenky (nebo zadejte jeho kód ručně) a stiskněte Enter pro okamžité odbavení.“*
+
+### 10.3 Možnosti fyzického nasazení u vstupu do budovy
+Díky tomu, že systém pracuje s nativním textovým vstupem a standardním API endpointem `/api/checkin/<kod>`, existují dvě hlavní metody, jak aplikaci na Dni otevřených dveří fyzicky provozovat:
+
+#### Metoda A: Hardwarový USB/Bluetooth skener (Emulace klávesnice)
+Toto je nejvíce doporučovaná metoda pro rychlé odbavování velkého počtu návštěvníků (až 60 osob za minutu):
+1. **Hardware**: K administračnímu notebooku se připojí standardní ruční čtečka čárových a QR kódů (laserová nebo CCD) přes USB kabel nebo Bluetooth.
+2. **Konfigurace čtečky**: Čtečka se ponechá ve výchozím továrním režimu **Keyboard Emulation (emulace klávesnice)** a nastaví se na ní automatické přidávání ukončovacího znaku *Carriage Return / Line Feed* (klávesa Enter po každém úspěšném načtení).
+3. **Průběh odbavení**: 
+   - Obsluha u vstupu klikne myší do textového pole *„Zadejte kód (DOD-xxxx)“* na svém notebooku.
+   - Návštěvník ukáže QR kód na displeji svého telefonu nebo vytištěný na papíře.
+   - Obsluha zaměří čtečku na kód. Čtečka kód bleskově dekóduje, zapíše jej do aktivního pole a automaticky odešle stiskem klávesy Enter.
+   - Webová aplikace okamžitě provede asynchronní API dotaz na server, přehraje akustické pípnutí, zobrazí velkou zelenou notifikaci se jménem návštěvníka a vrátí kurzor zpět do prázdného vyhledávacího pole pro dalšího návštěvníka. **Celý proces probíhá bez jediného dotyku klávesnice notebooku!**
+
+#### Metoda B: Ruční mobilní check-in
+Pokud škola nedisponuje externími skenery, může check-in provádět kterýkoliv ze studentů (průvodců) přímo na svém mobilním telefonu:
+1. Student se přihlásí do administračního panelu na svém chytrém telefonu (vzhledem k tomu, že je rozhraní plně responzivní a chráněné).
+2. Při příchodu návštěvníka student přečte kód z jeho lístku (např. `DOD-A5B2`) a jednoduše ho naťuká na softwarové klávesnici telefonu a klikne na velké tlačítko **„Odbavit lístek“**.
+3. Výhodou je mobilita – tito studenti mohou vítat a odbavovat návštěvníky již v šatně nebo přímo před budovou školy.
+
+### 10.4 Akustická a vizuální zpětná vazba v reálném čase
+Pro zamezení chyb a urychlení provozu obsahuje čtečka propracovaný systém zpětné vazby vyvinutý pomocí Web Audio API:
+- **Zelený stav (Úspěch)**: Pokud je kód platný a návštěvník dosud nebyl odbaven, přehraje se čistý vysoký tón (pípnutí o frekvenci 800 Hz po dobu 0.15s), pole zhasne a v zelené glassmorphic krabičce se zobrazí: *„Kód OK: Odbaven / Návštěvník [Jméno] byl úspěšně odbaven.“*
+- **Červený stav (Chyba / Duplicita)**: Pokud kód v databázi neexistuje, nebo pokud se stejný návštěvník pokouší projít podruhé (ochrana proti zneužití sdílených lístků), přehraje se varovný hluboký tón (bzučení o frekvenci 150 Hz po dobu 0.3s) a zobrazí se červené varování: *„Chyba: Neplatný kód / Tento lístek již byl odbaven dne [Čas]“* nebo *„Chyba: Neplatný kód / Kód lístku nebyl v databázi nalezen.“*
+
+Tato kapitola uzavírá vývojový deník a jasně demonstruje, že systém je plně připraven k praktickému nasazení a plní veškeré požadavky kladené na moderní, robustní a bezpečné webové řešení pro potřeby střední školy.
+
+
 

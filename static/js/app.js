@@ -788,7 +788,7 @@ const App = {
         }
     },
 
-    // SIMULÁTOR ČTEČKY QR KÓDŮ
+    // REÁLNÁ ČTEČKA QR KÓDŮ A ODBAVENÍ
     async processScannerInput() {
         const input = document.getElementById('scan-input');
         const feedback = document.getElementById('scan-feedback');
