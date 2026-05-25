@@ -582,6 +582,36 @@
                 </div>
             </section>
             
+            <!-- SECTION 3: PŘIHLAŠOVACÍ SCREEN PRO ADMINISTRACI -->
+            <section id="admin-login-view" class="view-section">
+                <div class="login-wrapper" style="display: flex; justify-content: center; align-items: center; min-height: 60vh; padding: 20px;">
+                    <div class="login-card glass animate-scale" style="width: 100%; max-width: 420px; padding: 40px; border-radius: 20px; text-align: center; box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2); border: 1px solid var(--border-color);">
+                        <div class="login-icon" style="font-size: 3.5rem; margin-bottom: 20px; color: var(--primary);">🔒</div>
+                        <h2 style="font-size: 1.8rem; font-weight: 800; margin-bottom: 10px; color: var(--text-primary);">Vstup do administrace</h2>
+                        <p style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 30px;">
+                            Přístup do administračního rozhraní SŠ André Citroëna Boskovice je chráněn heslem z důvodu zabezpečení osobních údajů.
+                        </p>
+                        
+                        <form id="admin-login-form" style="display: flex; flex-direction: column; gap: 20px;">
+                            <div class="form-group" style="text-align: left;">
+                                <label for="login-password">Přístupové heslo <span class="required">*</span></label>
+                                <div class="input-wrapper" style="position: relative;">
+                                    <span class="input-icon">🔑</span>
+                                    <input type="password" id="login-password" placeholder="Zadejte heslo..." required style="padding-right: 45px; width: 100%;">
+                                    <button type="button" id="btn-toggle-password" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); background: transparent; border: none; color: var(--text-secondary); cursor: pointer; font-size: 1.1rem; padding: 0; line-height: 1;">👁️</button>
+                                </div>
+                                <span class="error-msg" id="login-error-msg" style="display: none; color: var(--rose); font-size: 0.82rem; margin-top: 8px; font-weight: 600;">Nesprávné přístupové heslo!</span>
+                            </div>
+                            
+                            <button type="submit" id="btn-login-submit" class="btn-primary" style="width: 100%; padding: 14px; font-size: 1rem; font-weight: 700; display: flex; justify-content: center; align-items: center; gap: 8px; cursor: pointer;">
+                                <span class="btn-text">🛡️ Vstoupit do administrace</span>
+                                <span class="loader hidden"></span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </section>
+            
             <!-- SECTION 2: ADMINISTRAČNÍ PANEL -->
             <section id="admin-view" class="view-section">
                 

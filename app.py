@@ -14,6 +14,11 @@ app = Flask(__name__,
 
 DATABASE = os.path.join(os.path.dirname(__file__), 'database.db')
 MAX_CAPACITY_PER_SLOT = 30  # Limit kapacity pro jednotlivé sloty (celkový počet fyzických osob včetně doprovodu)
+ADMIN_PASSWORD = "Citroen2026"  # Přístupové heslo k administraci SŠ André Citroëna Boskovice
+
+def check_admin_auth():
+    auth_header = request.headers.get('X-Admin-Password')
+    return auth_header == ADMIN_PASSWORD
 
 def get_db_connection():
     conn = sqlite3.connect(DATABASE)
@@ -116,6 +121,22 @@ def index():
     return render_template('index.html')
 
 # --- API ENDPOINTY ---
+
+# 0. Ověření administrátorského hesla
+@app.route('/api/admin/auth', methods=['POST'])
+def admin_auth():
+    try:
+        data = request.json
+        if not data or 'password' not in data:
+            return jsonify({"status": "error", "message": "Nebylo zadáno heslo."}), 400
+            
+        password = data.get('password')
+        if password == ADMIN_PASSWORD:
+            return jsonify({"status": "success", "message": "Přihlášení úspěšné."}), 200
+        else:
+            return jsonify({"status": "error", "message": "Nesprávné přístupové heslo."}), 401
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
 
 # 1. Agregované statistiky
 @app.route('/api/stats', methods=['GET'])
@@ -248,6 +269,8 @@ def get_stats():
 # 2. Načtení seznamu návštěvníků s detailními filtry podle rešerše
 @app.route('/api/visitors', methods=['GET'])
 def get_visitors():
+    if not check_admin_auth():
+        return jsonify({"status": "error", "message": "Neoprávněný přístup - chybné heslo."}), 401
     try:
         search = request.args.get('search', '').strip()
         group = request.args.get('group', '').strip()
@@ -465,6 +488,8 @@ def register_visitor():
 # 4. Odbavení návštěvníka
 @app.route('/api/checkin/<visitor_id>', methods=['POST'])
 def checkin_visitor(visitor_id):
+    if not check_admin_auth():
+        return jsonify({"status": "error", "message": "Neoprávněný přístup - chybné heslo."}), 401
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
@@ -496,6 +521,8 @@ def checkin_visitor(visitor_id):
 # 5. Smazání návštěvníka
 @app.route('/api/visitors/<visitor_id>', methods=['DELETE'])
 def delete_visitor(visitor_id):
+    if not check_admin_auth():
+        return jsonify({"status": "error", "message": "Neoprávněný přístup - chybné heslo."}), 401
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
@@ -522,6 +549,8 @@ def delete_visitor(visitor_id):
 # 6. Reset databáze na původní stav
 @app.route('/api/reset', methods=['POST'])
 def reset_database():
+    if not check_admin_auth():
+        return jsonify({"status": "error", "message": "Neoprávněný přístup - chybné heslo."}), 401
     try:
         init_db(force_recreate=True)
         return jsonify({
@@ -535,6 +564,8 @@ def reset_database():
 # 7. Vynulování/vymazání všech registrací (příprava na reálný provoz)
 @app.route('/api/clear', methods=['POST'])
 def clear_database():
+    if not check_admin_auth():
+        return jsonify({"status": "error", "message": "Neoprávněný přístup - chybné heslo."}), 401
     try:
         conn = get_db_connection()
         cursor = conn.cursor()

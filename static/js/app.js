@@ -43,6 +43,9 @@ const App = {
 
         // Inicializace Často kladených dotazů (FAQ)
         this.initFaq();
+
+        // Inicializace přihlášení do administrace
+        this.initAdminLogin();
     },
 
     /* ==========================================================================
@@ -71,6 +74,10 @@ const App = {
     /* ==========================================================================
        2. SPA NAVIGACE (SINGLE PAGE APPLICATION ROUTER)
        ========================================================================== */
+    isAdminAuthenticated() {
+        return sessionStorage.getItem('admin_authenticated') === 'true';
+    },
+
     initNavigation() {
         const navButtons = document.querySelectorAll('.nav-btn');
         const sections = document.querySelectorAll('.view-section');
@@ -78,7 +85,14 @@ const App = {
         navButtons.forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const target = btn.getAttribute('data-target');
-                this.state.activeView = target;
+                
+                // Ověření admin hesla při vstupu do administrace
+                let actualTarget = target;
+                if (target === 'admin-view' && !this.isAdminAuthenticated()) {
+                    actualTarget = 'admin-login-view';
+                }
+                
+                this.state.activeView = actualTarget;
 
                 // Aktivace tlačítka v menu
                 navButtons.forEach(b => b.classList.remove('active'));
@@ -86,24 +100,118 @@ const App = {
 
                 // Zobrazení příslušné sekce
                 sections.forEach(sec => {
-                    if (sec.id === target) {
+                    if (sec.id === actualTarget) {
                         sec.classList.add('active');
                     } else {
                         sec.classList.remove('active');
                     }
                 });
 
-                // Pokud přecházíme do Administrace, načteme čerstvá data
-                if (target === 'admin-view') {
-                    // Inicializace AudioContext na pozadí (vyžaduje interakci uživatele)
+                // Pokud přecházíme do Administrace a jsme přihlášení, načteme data
+                if (actualTarget === 'admin-view') {
                     SoundEffects.init();
                     this.loadAdminDashboard();
+                } else if (actualTarget === 'admin-login-view') {
+                    const pwdInput = document.getElementById('login-password');
+                    if (pwdInput) {
+                        pwdInput.value = '';
+                        setTimeout(() => pwdInput.focus(), 150);
+                    }
                 } else {
-                    // Pokud jdeme na registraci, aktualizujeme kapacity
                     this.loadSlotCapacities();
                 }
             });
         });
+    },
+
+    initAdminLogin() {
+        const loginForm = document.getElementById('admin-login-form');
+        if (!loginForm) return;
+        
+        const pwdInput = document.getElementById('login-password');
+        const togglePwdBtn = document.getElementById('btn-toggle-password');
+        const errorMsg = document.getElementById('login-error-msg');
+        const submitBtn = document.getElementById('btn-login-submit');
+        const btnText = submitBtn.querySelector('.btn-text');
+        const loader = submitBtn.querySelector('.loader');
+        
+        // Zobrazit / Skrýt heslo
+        togglePwdBtn.addEventListener('click', () => {
+            if (pwdInput.type === 'password') {
+                pwdInput.type = 'text';
+                togglePwdBtn.innerText = '🙈';
+            } else {
+                pwdInput.type = 'password';
+                togglePwdBtn.innerText = '👁️';
+            }
+        });
+        
+        // Skrytí chyby při psaní
+        pwdInput.addEventListener('input', () => {
+            errorMsg.style.display = 'none';
+        });
+        
+        // Odeslání přihlášení
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const password = pwdInput.value;
+            
+            // Vizuální loader
+            submitBtn.disabled = true;
+            if (loader) loader.classList.remove('hidden');
+            if (btnText) btnText.innerText = 'Ověřuji...';
+            errorMsg.style.display = 'none';
+            
+            try {
+                const res = await fetch(`${this.apiBase}/admin/auth`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ password })
+                });
+                
+                const data = await res.json();
+                
+                if (res.status === 200 && data.status === 'success') {
+                    sessionStorage.setItem('admin_authenticated', 'true');
+                    sessionStorage.setItem('admin_password', password);
+                    
+                    SoundEffects.playSuccess();
+                    
+                    // Přechod na administraci
+                    this.navigateToView('admin-view');
+                } else {
+                    throw new Error(data.message || 'Nesprávné heslo.');
+                }
+            } catch (err) {
+                console.error("Chyba přihlášení:", err);
+                SoundEffects.playError();
+                errorMsg.style.display = 'block';
+                pwdInput.focus();
+            } finally {
+                submitBtn.disabled = false;
+                if (loader) loader.classList.add('hidden');
+                if (btnText) btnText.innerText = '🛡️ Vstoupit do administrace';
+            }
+        });
+    },
+    
+    navigateToView(target) {
+        const sections = document.querySelectorAll('.view-section');
+        this.state.activeView = target;
+        
+        sections.forEach(sec => {
+            if (sec.id === target) {
+                sec.classList.add('active');
+            } else {
+                sec.classList.remove('active');
+            }
+        });
+        
+        if (target === 'admin-view') {
+            this.loadAdminDashboard();
+        }
     },
 
     /* ==========================================================================
@@ -586,7 +694,11 @@ const App = {
         });
 
         try {
-            const res = await fetch(`${this.apiBase}/visitors?${params.toString()}`);
+            const res = await fetch(`${this.apiBase}/visitors?${params.toString()}`, {
+                headers: {
+                    'X-Admin-Password': sessionStorage.getItem('admin_password') || ''
+                }
+            });
             const data = await res.json();
 
             if (data.status === 'success') {
@@ -743,7 +855,10 @@ const App = {
     async toggleCheckIn(visitorId) {
         try {
             const res = await fetch(`${this.apiBase}/checkin/${visitorId}`, {
-                method: 'POST'
+                method: 'POST',
+                headers: {
+                    'X-Admin-Password': sessionStorage.getItem('admin_password') || ''
+                }
             });
             const data = await res.json();
             
@@ -774,7 +889,10 @@ const App = {
 
         try {
             const res = await fetch(`${this.apiBase}/visitors/${visitorId}`, {
-                method: 'DELETE'
+                method: 'DELETE',
+                headers: {
+                    'X-Admin-Password': sessionStorage.getItem('admin_password') || ''
+                }
             });
             const data = await res.json();
             
@@ -801,7 +919,10 @@ const App = {
 
         try {
             const res = await fetch(`${this.apiBase}/checkin/${code}`, {
-                method: 'POST'
+                method: 'POST',
+                headers: {
+                    'X-Admin-Password': sessionStorage.getItem('admin_password') || ''
+                }
             });
             const data = await res.json();
 
@@ -901,7 +1022,10 @@ const App = {
 
         try {
             const res = await fetch(`${this.apiBase}/reset`, {
-                method: 'POST'
+                method: 'POST',
+                headers: {
+                    'X-Admin-Password': sessionStorage.getItem('admin_password') || ''
+                }
             });
             const data = await res.json();
 
@@ -926,7 +1050,10 @@ const App = {
 
         try {
             const res = await fetch(`${this.apiBase}/clear`, {
-                method: 'POST'
+                method: 'POST',
+                headers: {
+                    'X-Admin-Password': sessionStorage.getItem('admin_password') || ''
+                }
             });
             const data = await res.json();
 
