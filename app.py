@@ -13,7 +13,7 @@ app = Flask(__name__,
             template_folder='templates')
 
 DATABASE = os.path.join(os.path.dirname(__file__), 'database.db')
-MAX_CAPACITY_PER_SLOT = 15  # Limit kapacity pro jednotlivé sloty (registrovaní hlavní návštěvníci)
+MAX_CAPACITY_PER_SLOT = 30  # Limit kapacity pro jednotlivé sloty (celkový počet fyzických osob včetně doprovodu)
 
 def get_db_connection():
     conn = sqlite3.connect(DATABASE)
@@ -169,8 +169,8 @@ def get_stats():
         cursor.execute('SELECT tour_type, COUNT(*) as count FROM visitors' + (" WHERE dod_date = ?" if params else "") + ' GROUP BY tour_type', params)
         tour_type_data = {row['tour_type']: row['count'] for row in cursor.fetchall()}
         
-        # Obsazenost časových slotů
-        cursor.execute('SELECT time_slot, COUNT(*) as count FROM visitors' + (" WHERE dod_date = ?" if params else "") + ' GROUP BY time_slot', params)
+        # Obsazenost časových slotů (celkový počet fyzických osob včetně doprovodu)
+        cursor.execute('SELECT time_slot, SUM(coalesce(accompanying_count, 0) + 1) as count FROM visitors' + (" WHERE dod_date = ?" if params else "") + ' GROUP BY time_slot', params)
         slots_data = {row['time_slot']: row['count'] for row in cursor.fetchall()}
         all_slots = [
             "09:00", "09:15", "09:30", "09:45",
@@ -396,17 +396,18 @@ def register_visitor():
         if not name or not email or not phone or not visitor_group or not time_slot:
             return jsonify({"status": "error", "message": "Všechna povinná pole musí být vyplněna."}), 400
             
-        # Zabezpečení kapacity časového slotu pro dané datum
+        # Zabezpečení kapacity časového slotu pro dané datum (celkový počet fyzických osob včetně doprovodu)
         conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute('SELECT COUNT(*) FROM visitors WHERE time_slot = ? AND dod_date = ?', (time_slot, dod_date))
-        count = cursor.fetchone()[0]
+        cursor.execute('SELECT SUM(coalesce(accompanying_count, 0) + 1) FROM visitors WHERE time_slot = ? AND dod_date = ?', (time_slot, dod_date))
+        current_people = cursor.fetchone()[0] or 0
         
-        if count >= MAX_CAPACITY_PER_SLOT:
+        new_people = 1 + accompanying_count
+        if current_people + new_people > MAX_CAPACITY_PER_SLOT:
             conn.close()
             return jsonify({
                 "status": "error", 
-                "message": f"Kapacita časového slotu '{time_slot}' je pro termín {dod_date} již obsazena ({MAX_CAPACITY_PER_SLOT}/{MAX_CAPACITY_PER_SLOT})."
+                "message": f"Nelze provést registraci. Kapacita časového slotu '{time_slot}' by byla překročena. Volná místa: {max(0, MAX_CAPACITY_PER_SLOT - current_people)}, vy požadujete: {new_people} (vy + {accompanying_count} doprovod)."
             }), 400
             
         # Unikátní ID lístku
